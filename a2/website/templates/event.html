@@ -1,149 +1,57 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SportsZone</title>
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+{% extends "base.html" %}
+{% block title %}{{ event.title }} · SportsZone{% endblock %}
+
+{% block extra_css %}
 <style>
-    /* body */ 
-    body { background-color:#a7f3d0; }
+  .event-hero{position:relative;width:100%;max-height:500px;overflow:hidden;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);margin-top:10px;}
+  .hero-banner{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.85);transition:transform .5s ease;}
+  .event-hero:hover .hero-banner{transform:scale(1.05);}
+  .hero-overlay{position:absolute;bottom:20px;left:20px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.7);}
+  .hero-title{font-size:2rem;font-weight:700;}
+  .hero-subtitle{font-size:1rem;margin-top:.25rem;}
+  @media (min-width:992px){ .sticky-side{position:sticky;top:1rem;} }
+</style>
+{% endblock %}
 
-    /* Navbar */
-    .sportszone-nav{ background:#134e4a; }
-    .sportszone-nav .nav-link{ color:#000; }
-    .sportszone-nav .nav-link:hover,
-    .sportszone-nav .nav-link.active{ color:#d58311c0; }
-    .sportszone-nav .navbar-brand{ color:#0e0e0f; }
-
-/* Hero banner  */
-.event-hero {
-  position: relative;
-  width: 100%;
-  max-height: 500px;          
-  overflow: hidden;
-  border-radius: 12px;       
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-  margin-top: 10px;
-}
-
-/* Image */
-.hero-banner {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;          
-  display: block;
-  filter: brightness(0.85);   
-  transition: transform 0.5s ease;
-}
-
-/* Hover  */
-.event-hero:hover .hero-banner {
-  transform: scale(1.05);
-}
-
-/* Text overlay */
-.hero-overlay {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  color: #fff;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.7);
-}
-
-.hero-title {
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.hero-subtitle {
-  font-size: 1rem;
-  margin-top: .25rem;
-}
-
-    
-    /* sticky booking panel */
-    @media (min-width: 992px){ .sticky-side{ position:sticky; top:1rem; } }
-  </style>
-</head>
-<body>
-  <header>
-    <!-- Navigation bar -->
- <nav class="navbar navbar-expand-lg navbar-dark sportszone-nav border-bottom sticky-top">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-        <img src="static/img/logoweb.png" alt="SportsZone logo" width="50" height="40">
-        <span class="fw-bold">SPORTSZONE</span>
-      </a>
-
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"
-              aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="nav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="create_event.html">Create Event</a></li>
-          <li class="nav-item"><a class="nav-link" href="booking.html">Booking History</a></li>
-
-          <!-- login and register -->
-          <li class="nav-item dropdown ms-3 mt-1">
-            <a class="nav-link d-flex align-items-center p-0" href="#" role="button"
-               data-bs-toggle="dropdown" aria-expanded="false" title="Account">
-              <img src="static/img/acct.jpg" alt="Account" width="35" height="30"
-                   class="rounded-circle" style="object-fit:cover;">
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="login.html">Login</a></li>
-              <li><a class="dropdown-item" href="register.html">Register</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</header>
-
-<main class="container py-4">
-
-
-  <!-- Hero banner -->
+{% block body %}
+<!-- Hero banner -->
 <div class="event-hero mb-3">
-  <img src="static/img/engvsspain.jpg" alt="England vs Spain" class="img-fluid hero-banner">
+  <img src="{{ url_for('static', filename='img/' ~ event.hero_image) }}"
+       alt="{{ event.title }}" class="img-fluid hero-banner">
   <div class="hero-overlay">
-    <h1 class="hero-title">England vs Spain</h1>
-    <p class="hero-subtitle">UEFA Euro 2025 Qualifier · Wembley Stadium</p>
+    <h1 class="hero-title">{{ event.title }}</h1>
+    <p class="hero-subtitle">{{ event.venue }}</p>
   </div>
 </div>
 
-
-  <!-- Teams row -->
-  <div class="d-flex justify-content-center align-items-center gap-4 mb-2">
-    <div class="text-center">
-      <img src="static/img/englandlogo.jpg" alt="England" width="65" class="mb-1" height="65">
-      <div class="small fw-bold">England</div>
-    </div>
-    <div class="h4 mb-0">vs</div>
-    <div class="text-center">
-      <img src="static/img/spainlogo.jpg" alt="Slovenia" width="60" class="mb-1">
-      <div class="small fw-bold">Spain</div>
-    </div>
+{# Teams (derived from title like "Team A vs Team B") #}
+{% set teams = event.title.split(' vs ') %}
+{% if teams|length == 2 %}
+<div class="d-flex justify-content-center align-items-center gap-4 mb-2">
+  <div class="text-center">
+    <div class="small fw-bold">{{ teams[0] }}</div>
   </div>
-
-  <!-- Title, badges -->
-  <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
-    <h1 class="h3 mb-0">England vs Spain</h1>
-    <span class="badge text-bg-primary">Football</span>
-    <span class="badge text-bg-success badge-status">Open</span>
+  <div class="h4 mb-0">vs</div>
+  <div class="text-center">
+    <div class="small fw-bold">{{ teams[1] }}</div>
   </div>
-  <p class="text-muted mb-0">Sat 18 Oct · 7:30–9:30 pm · Wembley Stadium, London</p>
-</header>
+</div>
+{% endif %}
+
+<!-- Title, badges -->
+<div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
+  <h1 class="h3 mb-0">{{ event.title }}</h1>
+  <span class="badge text-bg-primary">{{ event.sport }}</span>
+  <span class="badge text-bg-{{ event.badge }} badge-status">{{ event.status }}</span>
+</div>
+<p class="text-muted mb-3 text-center">
+  {{ event.start_text }}{% if event.end_text %} – {{ event.end_text }}{% endif %} · {{ event.venue }}
+</p>
 
 <div class="row g-4">
   <!-- details, description -->
   <div class="col-lg-8">
+<<<<<<< HEAD
     <section class="mt-3 about-event">
   <h2 class="h5 mb-3 text-primary fw-bold">About this event</h2>
   <p class="lead">
@@ -171,11 +79,29 @@
     <dd class="col-sm-9">England vs Spain</dd>
   </dl>
 </section>
+=======
+    <section class="mt-1 about-event">
+      <h2 class="h5 mb-3 text-primary fw-bold">About this event</h2>
+      <p class="lead">{{ event.description }}</p>
+
+      <dl class="row small event-details mt-3">
+        <dt class="col-sm-3 fw-bold">Venue</dt><dd class="col-sm-9">{{ event.venue }}</dd>
+        <dt class="col-sm-3 fw-bold">Start</dt><dd class="col-sm-9">{{ event.start_text }}</dd>
+        {% if event.end_text %}
+        <dt class="col-sm-3 fw-bold">End</dt><dd class="col-sm-9">{{ event.end_text }}</dd>
+        {% endif %}
+        {% if teams|length == 2 %}
+        <dt class="col-sm-3 fw-bold">Home / Away</dt><dd class="col-sm-9">{{ teams[0] }} vs {{ teams[1] }}</dd>
+        {% endif %}
+      </dl>
+    </section>
+>>>>>>> 4ebb7324208b9fe63fa9704fc6e20ae9d022907e
 
     <!-- Comments -->
     <section class="mt-4">
       <h2 class="h5 mb-3">Comments</h2>
       <ul class="list-group mb-3">
+<<<<<<< HEAD
         <li class="list-group-item">
           <b>Jake</b> <span class="text-muted small">· 12 Oct, 07:50</span>
           <p class="mb-0">Is there on-site parking at Wembley?</p>
@@ -186,6 +112,19 @@
         </li>
       </ul>
 
+=======
+        {% for c in event.comments %}
+          <li class="list-group-item">
+            <b>{{ c.user }}</b> <span class="text-muted small">· {{ c.created_at }}</span>
+            <p class="mb-0">{{ c.text }}</p>
+          </li>
+        {% else %}
+          <li class="list-group-item text-muted">No comments yet</li>
+        {% endfor %}
+      </ul>
+
+      {# Static demo form (disabled submit) #}
+>>>>>>> 4ebb7324208b9fe63fa9704fc6e20ae9d022907e
       <form class="card p-3">
         <div class="row g-2">
           <div class="col-md-4">
@@ -197,9 +136,13 @@
             <textarea class="form-control" rows="3" placeholder="Write your comment…" required></textarea>
           </div>
           <div class="col-12">
+<<<<<<< HEAD
             <button class="btn btn-outline-primary" type="submit" disabled>
               Post Comment 
             </button>
+=======
+            <button class="btn btn-outline-primary" type="submit" disabled>Post Comment</button>
+>>>>>>> 4ebb7324208b9fe63fa9704fc6e20ae9d022907e
           </div>
         </div>
       </form>
@@ -208,6 +151,7 @@
 
   <!-- Booking panel -->
   <aside class="col-lg-4">
+<<<<<<< HEAD
     <div class="card shadow-sm sticky-side">
       <div class="card-body">
         <h2 class="h6 mb-3">Book Tickets</h2>
@@ -224,12 +168,35 @@
         <input type="number" class="form-control form-control-sm mb-3" min="1" value="1">
 
         <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#confirmModal">
+=======
+    {% set can_book = (event.status == 'Open') %}
+    <div class="card shadow-sm sticky-side">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Book Tickets</h2>
+        <div class="small text-muted mb-2">
+          {% if can_book %}Tickets available: <b>120</b>
+          {% else %}<b>Booking unavailable ({{ event.status }})</b>{% endif %}
+        </div>
+
+        <label class="form-label">Ticket type</label>
+        <select class="form-select form-select-sm mb-2" aria-label="Ticket type" {% if not can_book %}disabled{% endif %}>
+          <option selected>General</option><option>Student</option><option>VIP</option>
+        </select>
+
+        <label class="form-label">Quantity</label>
+        <input type="number" class="form-control form-control-sm mb-3" min="1" value="1" {% if not can_book %}disabled{% endif %}>
+
+        <button class="btn btn-primary w-100 mb-2"
+                data-bs-toggle="modal" data-bs-target="#confirmModal"
+                {% if not can_book %}disabled aria-disabled="true"{% endif %}>
+>>>>>>> 4ebb7324208b9fe63fa9704fc6e20ae9d022907e
           Book Now
         </button>
       </div>
     </div>
   </aside>
 </div>
+<<<<<<< HEAD
 </main>
 
 <!-- Confirmation modal -->
@@ -296,3 +263,27 @@
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>
+=======
+
+<!-- Confirmation modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Booking Confirmation</h5>
+      <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body small text-muted">
+      Order ID: <b>#BK-12345</b><br>
+      Event: <b>{{ event.title }}</b><br>
+      Date/Time: {{ event.start_text }}{% if event.end_text %} – {{ event.end_text }}{% endif %}<br>
+      Venue: {{ event.venue }}<br>
+      Type: General · Qty: 1
+    </div>
+    <div class="modal-footer">
+      <a class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</a>
+      <a class="btn btn-primary" href="{{ url_for('main.booking') }}">View Booking History</a>
+    </div>
+  </div></div>
+</div>
+{% endblock %}
+>>>>>>> 4ebb7324208b9fe63fa9704fc6e20ae9d022907e

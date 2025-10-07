@@ -1,212 +1,93 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SportsZone</title>
+{% extends "base.html" %}
+{% block title %}Home · SportsZone{% endblock %}
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+{% block extra_css %}
+<style>
+  .hero-img{width:100%;height:65vh;object-fit:cover;object-position:top;}
+</style>
+{% endblock %}
 
-  <style>
-    /* body */ 
-    body { background-color:#a7f3d0; }
+{% block body %}
 
-    /* Navbar */
-    .sportszone-nav{ background:#134e4a; }
-    .sportszone-nav .nav-link{ color:#000; }
-    .sportszone-nav .nav-link:hover,
-    .sportszone-nav .nav-link.active{ color:#d58311c0; }
-    .sportszone-nav .navbar-brand{ color:#0e0e0f; }
-
-    /* Card  */
-    .card{
-      border:0;
-      border-radius:16px;
-      overflow:hidden;                  
-      box-shadow:0 10px 24px rgba(0,0,0,.08);
-      
-    }
-   .card:hover {
-  border: 2px solid #134e4a;  
-    }
-
-    /* card's media */
-    .card-media{
-      aspect-ratio:16/9;                 
-      background:#fff;                  
-    }
-    .card-media > img{
-      width:100%;
-      height:100%;
-      object-fit:contain;                
-      display:block;
-      padding:6px;                       
-    }
-
-    /* carousel */
-    .hero-img {
-  width: 100%;
-  height: 65vh;          
-  object-fit: cover;     
-  object-position: top;
-}
-    /* Toolbar box(Category, search, status) */
-.toolbar {
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  border: 1px solid rgba(0,0,0,.05);
-    }
-
-/* Category buttons */
-.cat-btn {
-  color: #134e4a;
-  background: #e6f7f3;
-  border: 1px solid #cceee7;
-  border-radius: 20px;
-  padding: 0.35rem 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s ease-in-out;
-}
-.cat-btn:hover {
-  background: #cceee7;
-  border-color: #99ddd1;
-}
-.cat-btn.active {
-  background: #134e4a;
-  color: #fff;
-  border-color: #134e4a;
-}
-
-/* Search box and button */
-.search-box {
-  border-radius: 20px 0 0 20px;
-}
-
-/* Responsive */
-@media (max-width: 576px) {
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .toolbar form {
-    width: 100%;
-    margin-left: 0 !important;
-  }
-}
-
-  </style>
-</head>
-
-<body>
-<header>
-<!-- Navigation bar -->
-  <nav class="navbar navbar-expand-lg navbar-dark sportszone-nav border-bottom sticky-top">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-        <img src="static/img/logoweb.png" alt="Sportszone logo" width="50" height="40">
-        <span class="fw-bold">SPORTSZONE</span>
-      </a>
-
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"
-              aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="nav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="create_event.html">Create Event</a></li>
-          <li class="nav-item"><a class="nav-link" href="booking.html">Booking History</a></li>
-
-          <!-- login and register -->
-          <li class="nav-item dropdown ms-3 mt-1">
-            <a class="nav-link d-flex align-items-center p-0" href="#" role="button"
-               data-bs-toggle="dropdown" aria-expanded="false" title="Account">
-              <img src="static/img/acct.jpg" alt="Account" width="35" height="30"
-                   class="rounded-circle" style="object-fit:cover;">
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="login.html">Login</a></li>
-              <li><a class="dropdown-item" href="register.html">Register</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</header>
-
-<main>
-  <!-- Carousel -->
-  <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000" data-bs-pause="hover">
-    <div class="carousel-indicators">
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-    </div>
-
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="static/img/carousel1.jpg" class="d-block hero-img" alt="Football">
-        <div class="carousel-caption d-none d-md-block">
-          <h5>International Football</h5><p>Weekend match under lights.</p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img src="static/img/carousal2.jpg" class="d-block hero-img" alt="Basketball">
-        <div class="carousel-caption d-none d-md-block">
-          <h5>Basketball League</h5><p>Fast breaks and big plays.</p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img src="static/img/carousel3.jpg" class="d-block hero-img" alt="Tennis">
-        <div class="carousel-caption d-none d-md-block">
-          <h5>Tennis championship</h5><p>Don’t miss the clash.</p>
-        </div>
-      </div>
-    </div>
-
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
+<!-- Hero Carousel -->
+<div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000" data-bs-pause="hover">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
   </div>
-  <!-- Browse + Search toolbar -->
+
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="{{ url_for('static', filename='img/carousel1.jpg') }}" class="d-block hero-img" alt="Football">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>International Football</h5><p>Weekend match under lights.</p>
+      </div>
+    </div>
+    <div class="carousel-item">
+      {# note: your file is named 'carousal2.jpg' in your assets #}
+      <img src="{{ url_for('static', filename='img/carousal2.jpg') }}" class="d-block hero-img" alt="Basketball">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Basketball League</h5><p>Fast breaks and big plays.</p>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="{{ url_for('static', filename='img/carousel3.jpg') }}" class="d-block hero-img" alt="Tennis">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Tennis Championship</h5><p>Don’t miss the clash.</p>
+      </div>
+    </div>
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+<!-- Browse + Search toolbar -->
 <div class="container pt-4">
   <div class="toolbar shadow-sm rounded-4 px-3 py-3">
+    {# read current filters from query string (optional) #}
+    {% set cat = request.args.get('category', 'all') %}
+    {% set st  = request.args.get('status', 'all') %}
+    {% set q   = request.args.get('q', '') %}
+
     <!-- Categories -->
     <div class="btn-group flex-wrap" role="group" aria-label="Browse by category">
-      <button type="button" class="btn cat-btn active">All</button>
-      <button type="button" class="btn cat-btn">Football</button>
-      <button type="button" class="btn cat-btn">Basketball</button>
-      <button type="button" class="btn cat-btn">Cricket</button>
-      <button type="button" class="btn cat-btn">Tennis</button>
+      <a class="btn cat-btn {{ 'active' if cat=='all' else '' }}" href="{{ url_for('main.index') }}">All</a>
+      <a class="btn cat-btn {{ 'active' if cat=='football' else '' }}" href="{{ url_for('main.index', category='football', status=st, q=q) }}">Football</a>
+      <a class="btn cat-btn {{ 'active' if cat=='basketball' else '' }}" href="{{ url_for('main.index', category='basketball', status=st, q=q) }}">Basketball</a>
+      <a class="btn cat-btn {{ 'active' if cat=='cricket' else '' }}" href="{{ url_for('main.index', category='cricket', status=st, q=q) }}">Cricket</a>
+      <a class="btn cat-btn {{ 'active' if cat=='tennis' else '' }}" href="{{ url_for('main.index', category='tennis', status=st, q=q) }}">Tennis</a>
     </div>
+
     <!-- Status -->
     <div class="btn-group flex-wrap ms-3" role="group" aria-label="Browse by status">
-      <button type="button" class="btn cat-btn active">All Status</button>
-      <button type="button" class="btn cat-btn">Open</button>
-      <button type="button" class="btn cat-btn">Sold Out</button>
-      <button type="button" class="btn cat-btn">Cancelled</button>
-      <button type="button" class="btn cat-btn">Inactive</button>
+      <a class="btn cat-btn {{ 'active' if st=='all' else '' }}" href="{{ url_for('main.index', category=cat, q=q) }}">All Status</a>
+      <a class="btn cat-btn {{ 'active' if st=='open' else '' }}" href="{{ url_for('main.index', category=cat, status='open', q=q) }}">Open</a>
+      <a class="btn cat-btn {{ 'active' if st=='soldout' else '' }}" href="{{ url_for('main.index', category=cat, status='soldout', q=q) }}">Sold Out</a>
+      <a class="btn cat-btn {{ 'active' if st=='cancelled' else '' }}" href="{{ url_for('main.index', category=cat, status='cancelled', q=q) }}">Cancelled</a>
+      <a class="btn cat-btn {{ 'active' if st=='inactive' else '' }}" href="{{ url_for('main.index', category=cat, status='inactive', q=q) }}">Inactive</a>
     </div>
 
     <!-- Search -->
-    <form class="ms-auto" role="search" style="min-width:250px; max-width:350px;">
+    <form class="ms-auto" role="search" method="get" action="{{ url_for('main.index') }}" style="min-width:250px; max-width:350px;">
+      <input type="hidden" name="category" value="{{ cat }}">
+      <input type="hidden" name="status" value="{{ st }}">
       <div class="input-group input-group-sm">
-        <input class="form-control search-box" type="search" placeholder="Search events.." aria-label="Search events">
+        <input class="form-control search-box" type="search" name="q" value="{{ q }}" placeholder="Search events.." aria-label="Search events">
         <button class="btn btn-primary search-btn" type="submit">Go</button>
       </div>
     </form>
   </div>
 </div>
 
+<<<<<<< HEAD
 
   <!-- Events grid -->
   <div class="container py-4">
@@ -441,3 +322,36 @@
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
 </html>
+=======
+<!-- Events grid -->
+<div class="container py-4">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+    {% for e in events %}
+      <div class="col event" data-category="{{ e.sport|lower }}" data-status="{{ e.status|lower }}">
+        <div class="card h-100">
+          <div class="card-media">
+            <img src="{{ url_for('static', filename='img/' ~ e.image) }}" alt="{{ e.sport }}">
+          </div>
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="badge text-bg-primary">{{ e.sport }}</span>
+              <span class="badge text-bg-{{ e.badge }}">{{ e.status }}</span>
+            </div>
+            <h5 class="card-title mb-1">{{ e.title }}</h5>
+            <p class="card-text text-muted small mb-2">
+              <strong>{{ e.start_text }}</strong><br>
+              {{ e.venue }}
+            </p>
+            <a href="{{ url_for('main.view_event', event_id=e.id) }}" class="btn btn-primary mt-auto">View Details</a>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="col">
+        <div class="alert alert-info mb-0">No events found.</div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+>>>>>>> 4ebb7324208b9fe63fa9704fc6e20ae9d022907e

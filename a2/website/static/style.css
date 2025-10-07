@@ -1,0 +1,61 @@
+/* === Global / Shared Styles === */
+
+/* Body */
+body { background-color:#a7f3d0; }
+
+/* Navbar */
+.sportszone-nav{ background:#134e4a; }
+.sportszone-nav .nav-link{ color:#000; }
+.sportszone-nav .nav-link:hover,
+.sportszone-nav .nav-link.active{ color:#d58311c0; }
+.sportszone-nav .navbar-brand{ color:#0e0e0f; }
+
+/* Cards (generic) */
+.card{
+  border:0;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 10px 24px rgba(0,0,0,.08);
+}
+.card:hover { border: 2px solid #134e4a; }
+
+/* Card media helper */
+.card-media{ aspect-ratio:16/9; background:#fff; }
+.card-media > img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  padding:6px;
+}
+
+/* Toolbar (categories, search, status) */
+.toolbar{
+  background:#ffffff;
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  border:1px solid rgba(0,0,0,.05);
+}
+
+/* Category buttons */
+.cat-btn{
+  color:#134e4a;
+  background:#e6f7f3;
+  border:1px solid #cceee7;
+  border-radius:20px;
+  padding:0.35rem 0.9rem;
+  font-weight:500;
+  transition:all 0.2s ease-in-out;
+}
+.cat-btn:hover{ background:#cceee7; border-color:#99ddd1; }
+.cat-btn.active{ background:#134e4a; color:#fff; border-color:#134e4a; }
+
+/* Search box */
+.search-box{ border-radius:20px 0 0 20px; }
+
+/* Responsive tweaks shared */
+@media (max-width:576px){
+  .toolbar{ flex-direction:column; align-items:stretch; }
+  .toolbar form{ width:100%; margin-left:0 !important; }
+}
