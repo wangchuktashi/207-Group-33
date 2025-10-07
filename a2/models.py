@@ -19,6 +19,7 @@ class Event(db.Model):
     event_image = db.Column(db.String(64))
     start_datetime = db.Column(db.DateTime, default=datetime.now())
     end_datetime = db.Column(db.DateTime, default=datetime.now())
+    # relationship to user
 
     # string print method
     def __repr__(self):
@@ -31,6 +32,7 @@ class EventStatus(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     event_status = db.Column(db.String(32), index=True)
     event_status_date = db.Column(db.DateTime, default=datetime.now())
+    # relationship to event
 
     # string print method
     def __repr__(self):
@@ -43,6 +45,7 @@ class Venue(db.Model):
     venue_name = db.Column(db.String(128))
     venue_address = db.Column(db.String(256), nullable=True)
     capacity = db.Column(db.Integer)
+    # relationship to event
 
     # string print method
     def __repr__(self):
@@ -56,6 +59,7 @@ class Comment(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     text = db.Column(db.String(400))
     posted_date = db.Column(db.DateTime, default=datetime.now())
+    # relationship to user
 
     # string print method
     def __repr__(self):
@@ -69,6 +73,8 @@ class Booking(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     booking_date = db.Column(db.DateTime, default=datetime.now())
     booking_quantity = db.Column(db.Integer)
+    # relationship to user
+    # relationship to event
 
     # string print method
     def __repr__(self):
@@ -82,6 +88,7 @@ class Ticket(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     ticket_price = db.Column(db.Float)
     tickets_available = db.Column(db.Integer)
+    # relationship to booking
 
     # string print method
     def __repr__(self):
