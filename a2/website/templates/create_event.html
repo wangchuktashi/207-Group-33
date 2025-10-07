@@ -1,75 +1,161 @@
 {% extends "base.html" %}
-{% block title %}Create / Update Event · SportsZone{% endblock %}
+{% block title %}{{ 'Update Event' if event else 'Create Event' }} · SportsZone{% endblock %}
 
 {% block extra_css %}
 <style>
-  .panel{background:#e6f7f3;border:1px solid #b2dfd5;border-radius:.250rem;box-shadow:0 6px 18px rgba(84,97,96,.15);}
+  .panel{
+    background:#e6f7f3;
+    border:1px solid #b2dfd5;
+    border-radius:.250rem;
+    box-shadow:0 6px 18px rgba(84,97,96,.15);
+  }
 </style>
 {% endblock %}
 
 {% block body %}
 <header class="mb-3">
-  <h1 class="h3 mb-1">Create / Update Event</h1>
+  <h1 class="h3 mb-1">{{ 'Update Event' if event else 'Create Event' }}</h1>
   <p class="text-muted mb-0 fw-bold">Enter the event details below.</p>
 </header>
+
+{# Flash messages from the controller (e.g., flash('Event saved (demo).')) #}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="alert alert-success" role="alert">
+      {{ messages[0] }}
+    </div>
+  {% endif %}
+{% endwith %}
 
 <div class="row g-4">
   <div class="col-lg-8">
     <form class="panel p-3 p-md-4" method="post" action="{{ url_for('main.create_event') }}">
       <div class="row g-3">
+        <!-- Title + Sport -->
         <div class="col-md-8">
           <label class="form-label">Event Title</label>
-          <input type="text" class="form-control" name="title" placeholder="e.g., Portugal vs Argentina" required>
+          <input
+            type="text"
+            class="form-control"
+            name="title"
+            placeholder="e.g., Portugal vs Argentina"
+            value="{{ event.title if event is defined else '' }}"
+            required
+          >
         </div>
         <div class="col-md-4">
           <label class="form-label">Sport Type</label>
           <select class="form-select" name="sport" required>
-            <option value="" selected disabled>Choose...</option>
-            <option>Football</option><option>Basketball</option><option>Rugby</option>
-            <option>Cricket</option><option>Tennis</option><option>Hockey</option>
+            <option value="" disabled {{ '' if event is defined else 'selected' }}>Choose...</option>
+            {% set sport = event.sport|lower if event is defined else '' %}
+            <option {{ 'selected' if sport=='football' else '' }}>Football</option>
+            <option {{ 'selected' if sport=='basketball' else '' }}>Basketball</option>
+            <option {{ 'selected' if sport=='rugby' else '' }}>Rugby</option>
+            <option {{ 'selected' if sport=='cricket' else '' }}>Cricket</option>
+            <option {{ 'selected' if sport=='tennis' else '' }}>Tennis</option>
+            <option {{ 'selected' if sport=='hockey' else '' }}>Hockey</option>
           </select>
         </div>
 
+        <!-- Teams (optional for display only; your details page derives from title) -->
         <div class="col-md-6">
           <label class="form-label">Home Team</label>
-          <input type="text" class="form-control" name="home" placeholder="e.g., Portugal" required>
+          <input
+            type="text"
+            class="form-control"
+            name="home"
+            placeholder="e.g., Portugal"
+            value="{{ event.home if event is defined and event.home is defined else '' }}"
+            required
+          >
         </div>
         <div class="col-md-6">
           <label class="form-label">Away Team</label>
-          <input type="text" class="form-control" name="away" placeholder="e.g., Argentina" required>
+          <input
+            type="text"
+            class="form-control"
+            name="away"
+            placeholder="e.g., Argentina"
+            value="{{ event.away if event is defined and event.away is defined else '' }}"
+            required
+          >
         </div>
 
+        <!-- Timing -->
         <div class="col-md-6">
           <label class="form-label">Start (date & time)</label>
-          <input type="datetime-local" class="form-control" name="start" required>
+          <input
+            type="datetime-local"
+            class="form-control"
+            name="start"
+            value="{{ event.start_value if event is defined and event.start_value is defined else '' }}"
+            required
+          >
         </div>
         <div class="col-md-6">
           <label class="form-label">End (date & time)</label>
-          <input type="datetime-local" class="form-control" name="end" required>
+          <input
+            type="datetime-local"
+            class="form-control"
+            name="end"
+            value="{{ event.end_value if event is defined and event.end_value is defined else '' }}"
+            required
+          >
         </div>
 
+        <!-- Venue + Tickets -->
         <div class="col-md-8">
           <label class="form-label">Venue</label>
-          <input type="text" class="form-control" name="venue" placeholder="e.g., Old Trafford Stadium" required>
+          <input
+            type="text"
+            class="form-control"
+            name="venue"
+            placeholder="e.g., Old Trafford Stadium"
+            value="{{ event.venue if event is defined else '' }}"
+            required
+          >
         </div>
         <div class="col-md-4">
           <label class="form-label">Total Tickets</label>
-          <input type="number" class="form-control" name="tickets" min="0" value="99" required>
+          <input
+            type="number"
+            class="form-control"
+            name="tickets"
+            min="0"
+            value="{{ event.capacity if event is defined and event.capacity is defined else 99 }}"
+            required
+          >
           <div class="form-text">Enter 0 if not yet allocated.</div>
         </div>
 
+        <!-- Image -->
         <div class="col-12">
           <label class="form-label">Image URL</label>
-          <input type="url" class="form-control" name="image" placeholder="https://example.com/your-image.jpg">
+          <input
+            type="url"
+            class="form-control"
+            name="image"
+            placeholder="https://example.com/your-image.jpg"
+            value="{% if event is defined %}{{ event.hero_image if event.hero_image is defined else event.image }}{% endif %}"
+          >
+          <div class="form-text">For your cards, store just the filename later (e.g., <code>ft1.jpg</code>) in the DB.</div>
         </div>
 
+        <!-- Description -->
         <div class="col-12">
           <label class="form-label">Description</label>
-          <textarea class="form-control" name="description" rows="4" placeholder="Short description for attendees…" required></textarea>
+          <textarea
+            class="form-control"
+            name="description"
+            rows="4"
+            placeholder="Short description for attendees…"
+            required
+          >{{ event.description if event is defined else '' }}</textarea>
         </div>
 
+        <!-- Actions -->
         <div class="col-12 d-flex gap-2">
-          <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#savedModal">Save Event</button>
+          <button type="submit" class="btn btn-primary">Save Event</button>
           <button type="reset" class="btn btn-outline-secondary">Reset</button>
           <a href="{{ url_for('main.index') }}" class="btn btn-link">Cancel</a>
         </div>
@@ -78,7 +164,7 @@
   </div>
 </div>
 
-<!-- Save modal (optional; can show after POST redirect) -->
+{# Optional modal kept for later; not auto-triggered to avoid custom JS in this unit #}
 <div class="modal fade" id="savedModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog"><div class="modal-content">
     <div class="modal-header"><h5 class="modal-title">Event Saved</h5><button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>

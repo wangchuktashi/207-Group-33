@@ -17,86 +17,54 @@
 {% endblock %}
 
 {% block body %}
-<header class="mb-3"><h1 class="h3 mb-1">Your Bookings</h1></header>
+<header class="mb-3">
+  <h1 class="h3 mb-1">Your Bookings</h1>
+</header>
 
-<div class="row g-3">
-  <!-- Booking 1 -->
-  <div class="col-12">
-    <div class="card booking-card shadow-sm">
-      <div class="row g-0 booking-row">
-        <div class="col-12 col-md-3 booking-thumb-wrap">
-          <img src="{{ url_for('static', filename='img/ft1.jpg') }}" class="booking-thumb" alt="England vs Spain">
-        </div>
-        <div class="col-12 col-md-9">
-          <div class="booking-body">
-            <div class="d-flex flex-wrap align-items-start">
-              <h5 class="booking-title mb-0">England vs Spain</h5>
-              <span class="badge text-bg-primary booking-badge">Football</span>
+{% if orders and orders|length > 0 %}
+  <div class="row g-3">
+    {% set color_map = {'Football':'primary','Basketball':'warning','Cricket':'success','Tennis':'secondary'} %}
+    {% for o in orders %}
+      <div class="col-12">
+        <div class="card booking-card shadow-sm">
+          <div class="row g-0 booking-row">
+            <!-- image -->
+            <div class="col-12 col-md-3 booking-thumb-wrap">
+              <img src="{{ url_for('static', filename='img/' ~ o.image) }}" class="booking-thumb" alt="{{ o.event_title }}">
             </div>
-            <div class="booking-meta">
-              <p class="small text-muted mb-1">Booked on: <b>Sat 15 Oct, 3:20 pm</b></p>
-              <p class="small mb-2">Order ID: <span class="fw-semibold">#AF-00234</span></p>
+
+            <!-- content -->
+            <div class="col-12 col-md-9">
+              <div class="booking-body">
+                <div class="d-flex flex-wrap align-items-start">
+                  <h5 class="booking-title mb-0">{{ o.event_title }}</h5>
+                  <span class="badge text-bg-{{ color_map[o.sport] if o.sport in color_map else 'secondary' }} booking-badge">{{ o.sport }}</span>
+                </div>
+
+                <div class="booking-meta">
+                  <p class="small text-muted mb-1">Booked on: <b>{{ o.booked_at }}</b></p>
+                  <p class="small mb-2">
+                    Order ID: <span class="fw-semibold">{{ o.order_code }}</span>
+                    {% if o.quantity %} · Qty: <span class="fw-semibold">{{ o.quantity }}</span>{% endif %}
+                  </p>
+                </div>
+
+                <div class="booking-actions">
+                  <a href="{{ url_for('main.view_event', event_id=o.event_id) }}" class="btn btn-sm btn-primary">View Event</a>
+                </div>
+              </div>
             </div>
-            <div class="booking-actions">
-              <a href="{{ url_for('main.view_event', event_id=1) }}" class="btn btn-sm btn-primary">View Event</a>
-            </div>
+
           </div>
         </div>
       </div>
-    </div>
+    {% endfor %}
   </div>
-
-  <!-- Booking 2 -->
-  <div class="col-12">
-    <div class="card booking-card shadow-sm">
-      <div class="row g-0 booking-row">
-        <div class="col-12 col-md-3 booking-thumb-wrap">
-          <img src="{{ url_for('static', filename='img/basketball1.jpg') }}" class="booking-thumb" alt="Miami Heats vs Brooklyn Nets">
-        </div>
-        <div class="col-12 col-md-9">
-          <div class="booking-body">
-            <div class="d-flex flex-wrap align-items-start">
-              <h5 class="booking-title mb-0">Miami Heats vs Brooklyn Nets</h5>
-              <span class="badge text-bg-warning booking-badge">Basketball</span>
-            </div>
-            <div class="booking-meta">
-              <p class="small text-muted mb-1">Booked on: <b>Fri 17 Oct, 6:02 pm</b></p>
-              <p class="small mb-2">Order ID: <span class="fw-semibold">#OF-12112</span></p>
-            </div>
-            <div class="booking-actions">
-              <a href="{{ url_for('main.view_event', event_id=2) }}" class="btn btn-sm btn-primary">View Event</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+{% else %}
+  <div class="alert alert-info">
+    You haven’t booked any events yet.
+    <a href="{{ url_for('main.index') }}" class="alert-link">Browse events</a>
   </div>
-
-  <!-- Booking 3 -->
-  <div class="col-12">
-    <div class="card booking-card shadow-sm">
-      <div class="row g-0 booking-row">
-        <div class="col-12 col-md-3 booking-thumb-wrap">
-          <img src="{{ url_for('static', filename='img/cricket1.jpg') }}" class="booking-thumb" alt="India vs Australia">
-        </div>
-        <div class="col-12 col-md-9">
-          <div class="booking-body">
-            <div class="d-flex flex-wrap align-items-start">
-              <h5 class="booking-title mb-0">India vs Australia</h5>
-              <span class="badge text-bg-success booking-badge">Cricket</span>
-            </div>
-            <div class="booking-meta">
-              <p class="small text-muted mb-1">Booked on: <b>Thu 17 Oct, 11:40 am</b></p>
-              <p class="small mb-2">Order ID: <span class="fw-semibold">#OI-15345</span></p>
-            </div>
-            <div class="booking-actions">
-              <a href="{{ url_for('main.view_event', event_id=3) }}" class="btn btn-sm btn-primary">View Event</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
+{% endif %}
 {% endblock %}
+

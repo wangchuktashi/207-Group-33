@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Event Details · SportsZone{% endblock %}
+{% block title %}{{ event.title }} · SportsZone{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -16,54 +16,54 @@
 {% block body %}
 <!-- Hero banner -->
 <div class="event-hero mb-3">
-  <img src="{{ url_for('static', filename='img/engvsspain.jpg') }}" alt="England vs Spain" class="img-fluid hero-banner">
+  <img src="{{ url_for('static', filename='img/' ~ event.hero_image) }}"
+       alt="{{ event.title }}" class="img-fluid hero-banner">
   <div class="hero-overlay">
-    <h1 class="hero-title">England vs Spain</h1>
-    <p class="hero-subtitle">UEFA Euro 2025 Qualifier · Wembley Stadium</p>
+    <h1 class="hero-title">{{ event.title }}</h1>
+    <p class="hero-subtitle">{{ event.venue }}</p>
   </div>
 </div>
 
-<!-- Teams -->
+{# Teams (derived from title like "Team A vs Team B") #}
+{% set teams = event.title.split(' vs ') %}
+{% if teams|length == 2 %}
 <div class="d-flex justify-content-center align-items-center gap-4 mb-2">
   <div class="text-center">
-    <img src="{{ url_for('static', filename='img/englandlogo.jpg') }}" alt="England" width="65" height="65" class="mb-1">
-    <div class="small fw-bold">England</div>
+    <div class="small fw-bold">{{ teams[0] }}</div>
   </div>
   <div class="h4 mb-0">vs</div>
   <div class="text-center">
-    <img src="{{ url_for('static', filename='img/spainlogo.jpg') }}" alt="Spain" width="60" class="mb-1">
-    <div class="small fw-bold">Spain</div>
+    <div class="small fw-bold">{{ teams[1] }}</div>
   </div>
 </div>
+{% endif %}
 
 <!-- Title, badges -->
 <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
-  <h1 class="h3 mb-0">England vs Spain</h1>
-  <span class="badge text-bg-primary">Football</span>
-  <span class="badge text-bg-success badge-status">Open</span>
+  <h1 class="h3 mb-0">{{ event.title }}</h1>
+  <span class="badge text-bg-primary">{{ event.sport }}</span>
+  <span class="badge text-bg-{{ event.badge }} badge-status">{{ event.status }}</span>
 </div>
-<p class="text-muted mb-3 text-center">Sat 18 Oct · 7:30–9:30 pm · Wembley Stadium, London</p>
+<p class="text-muted mb-3 text-center">
+  {{ event.start_text }}{% if event.end_text %} – {{ event.end_text }}{% endif %} · {{ event.venue }}
+</p>
 
 <div class="row g-4">
   <!-- details, description -->
   <div class="col-lg-8">
     <section class="mt-1 about-event">
       <h2 class="h5 mb-3 text-primary fw-bold">About this event</h2>
-      <p class="lead">
-        <strong class="fw-bold">UEFA Euro 2025 Qualifier</strong> — Witness
-        <span class="fw-bold">England</span> take on <span class="fw-bold">Spain</span>
-        in a thrilling group-stage clash under the lights at Wembley.
-      </p>
-      <p class="text-muted">
-        Family-friendly event with open seating, food trucks, and live entertainment.
-        <br><strong>Gates open at 6:45 pm</strong> — arrive early to avoid queues.
-      </p>
+      <p class="lead">{{ event.description }}</p>
 
       <dl class="row small event-details mt-3">
-        <dt class="col-sm-3 fw-bold">Venue</dt><dd class="col-sm-9">Wembley Stadium, London</dd>
-        <dt class="col-sm-3 fw-bold">Start</dt><dd class="col-sm-9">Sat 18 Oct, 7:30 pm</dd>
-        <dt class="col-sm-3 fw-bold">End</dt><dd class="col-sm-9">Sat 18 Oct, 9:30 pm</dd>
-        <dt class="col-sm-3 fw-bold">Home / Away</dt><dd class="col-sm-9">England vs Spain</dd>
+        <dt class="col-sm-3 fw-bold">Venue</dt><dd class="col-sm-9">{{ event.venue }}</dd>
+        <dt class="col-sm-3 fw-bold">Start</dt><dd class="col-sm-9">{{ event.start_text }}</dd>
+        {% if event.end_text %}
+        <dt class="col-sm-3 fw-bold">End</dt><dd class="col-sm-9">{{ event.end_text }}</dd>
+        {% endif %}
+        {% if teams|length == 2 %}
+        <dt class="col-sm-3 fw-bold">Home / Away</dt><dd class="col-sm-9">{{ teams[0] }} vs {{ teams[1] }}</dd>
+        {% endif %}
       </dl>
     </section>
 
@@ -71,10 +71,17 @@
     <section class="mt-4">
       <h2 class="h5 mb-3">Comments</h2>
       <ul class="list-group mb-3">
-        <li class="list-group-item"><b>Jake</b> <span class="text-muted small">· 12 Oct, 07:50</span><p class="mb-0">Is there on-site parking at Wembley?</p></li>
-        <li class="list-group-item"><b>Tom</b> <span class="text-muted small">· 10 Oct, 18:05</span><p class="mb-0">Is Foden playing?</p></li>
+        {% for c in event.comments %}
+          <li class="list-group-item">
+            <b>{{ c.user }}</b> <span class="text-muted small">· {{ c.created_at }}</span>
+            <p class="mb-0">{{ c.text }}</p>
+          </li>
+        {% else %}
+          <li class="list-group-item text-muted">No comments yet</li>
+        {% endfor %}
       </ul>
 
+      {# Static demo form (disabled submit) #}
       <form class="card p-3">
         <div class="row g-2">
           <div class="col-md-4">
@@ -95,20 +102,28 @@
 
   <!-- Booking panel -->
   <aside class="col-lg-4">
+    {% set can_book = (event.status == 'Open') %}
     <div class="card shadow-sm sticky-side">
       <div class="card-body">
         <h2 class="h6 mb-3">Book Tickets</h2>
-        <div class="small text-muted mb-2">Tickets available: <b>120</b></div>
+        <div class="small text-muted mb-2">
+          {% if can_book %}Tickets available: <b>120</b>
+          {% else %}<b>Booking unavailable ({{ event.status }})</b>{% endif %}
+        </div>
 
         <label class="form-label">Ticket type</label>
-        <select class="form-select form-select-sm mb-2" aria-label="Ticket type">
+        <select class="form-select form-select-sm mb-2" aria-label="Ticket type" {% if not can_book %}disabled{% endif %}>
           <option selected>General</option><option>Student</option><option>VIP</option>
         </select>
 
         <label class="form-label">Quantity</label>
-        <input type="number" class="form-control form-control-sm mb-3" min="1" value="1">
+        <input type="number" class="form-control form-control-sm mb-3" min="1" value="1" {% if not can_book %}disabled{% endif %}>
 
-        <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#confirmModal">Book Now</button>
+        <button class="btn btn-primary w-100 mb-2"
+                data-bs-toggle="modal" data-bs-target="#confirmModal"
+                {% if not can_book %}disabled aria-disabled="true"{% endif %}>
+          Book Now
+        </button>
       </div>
     </div>
   </aside>
@@ -117,13 +132,20 @@
 <!-- Confirmation modal -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog"><div class="modal-content">
-    <div class="modal-header"><h5 class="modal-title">Booking Confirmation</h5><button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+    <div class="modal-header">
+      <h5 class="modal-title">Booking Confirmation</h5>
+      <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
     <div class="modal-body small text-muted">
-      Order ID: <b>#BK-12345</b><br>Event: <b>England vs Spain</b><br>Date/Time: Sat 18 Oct, 7:30 pm<br>Venue: Wembley Stadium, London<br>Type: General · Qty: 1
+      Order ID: <b>#BK-12345</b><br>
+      Event: <b>{{ event.title }}</b><br>
+      Date/Time: {{ event.start_text }}{% if event.end_text %} – {{ event.end_text }}{% endif %}<br>
+      Venue: {{ event.venue }}<br>
+      Type: General · Qty: 1
     </div>
     <div class="modal-footer">
       <a class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</a>
-      <a class="btn btn-primary" href="{{ url_for('events.list_events') }}">View Booking History</a>
+      <a class="btn btn-primary" href="{{ url_for('main.booking') }}">View Booking History</a>
     </div>
   </div></div>
 </div>
