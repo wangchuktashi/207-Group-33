@@ -8,10 +8,10 @@ class User(db.Model, UserMixin):
 
 # sports event related data 
 class Event(db.Model):
-    __tablename__ = "event"
+    __tablename__ = "events"
     id = db.Column(db.Integer, primary_key=True)
     # user id (FK)
-    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'))
+    venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'))
     sports_type = db.Column(db.String(64), unique=True, index=True)
     event_title = db.Column(db.String(256))
     home_team_name = db.Column(db.String(64))
@@ -28,7 +28,7 @@ class Event(db.Model):
 class EventStatus(db.Model):
     __tablename__ = "eventStatus"
     id = db.Column(db.Integer, primary_key=True)
-    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     event_status = db.Column(db.String(32), index=True)
     event_status_date = db.Column(db.DateTime, default=datetime.now())
 
@@ -38,7 +38,7 @@ class EventStatus(db.Model):
 
 # venue related data
 class Venue(db.Model):
-    __tablename__ = "venue"
+    __tablename__ = "venues"
     id = db.Column(db.Integer, primary_key=True)
     venue_name = db.Column(db.String(128))
     venue_address = db.Column(db.String(256), nullable=True)
@@ -50,7 +50,16 @@ class Venue(db.Model):
     
 # user comment data
 class Comment(db.Model):
-    pass
+    __tablename__ = "comments"
+    id = db.Column(db.Integer, primary_key=True)
+    # user id (FK)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
+    text = db.Column(db.String(400))
+    posted_date = db.Column(db.DateTime, default=datetime.now())
+
+    # string print method
+    def __repr__(self):
+        return f"Comment: {self.text}"
 
 # booking & ticket data
 class Booking(db.Model):
