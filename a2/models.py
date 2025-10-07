@@ -63,7 +63,16 @@ class Comment(db.Model):
 
 # booking data
 class Booking(db.Model):
-    pass
+    __tablename__ = "bookings"
+    id = db.Column(db.Integer, primary_key=True)
+    # user id (FK)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
+    booking_date = db.Column(db.DateTime, default=datetime.now())
+    booking_quantity = db.Column(db.Integer)
+
+    # string print method
+    def __repr__(self):
+        return f"Booking: {self.integer}"
 
 # ticket data
 class Ticket(db.Model):
@@ -77,4 +86,3 @@ class Ticket(db.Model):
     # string print method
     def __repr__(self):
         return f"Ticket: {self.integer}"
-
