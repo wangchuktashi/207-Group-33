@@ -56,5 +56,3 @@ class Order(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.timezone.utc)
 
-
-class Order(db.Model):
