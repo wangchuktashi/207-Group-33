@@ -6,76 +6,48 @@
   <title>SportsZone — Booking History</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <style>
-     /* body */ 
-    body { background-color:#a7f3d0; }
+<style>
+  /* Booking cards */
+  .booking-card{
+    border:1px solid rgba(72,72,72,0.06);
+    border-radius:14px;
+    overflow:hidden;
+    background:#bff1ec;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .booking-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.12);
+  }
 
-    /* Navbar */
-    .sportszone-nav{ background:#134e4a; }
-    .sportszone-nav .nav-link{ color:#000; }
-    .sportszone-nav .nav-link:hover,
-    .sportszone-nav .nav-link.active{ color:#d58311c0; }
-    .sportszone-nav .navbar-brand{ color:#0e0e0f; }
-   
-    /* booking cards */
-    .booking-thumb{
-      width:100%;
-      aspect-ratio:1/1;      
-      object-fit:cover;      
-    }
-   
-.booking-card {
-  border: 1px solid rgba(72, 72, 72, 0.06);
-  border-radius: 14px;
-  overflow: hidden;
-  background: #bff1ec;
-}
-.booking-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-}
+  .booking-row{ min-height:200px; align-items:stretch; }
 
+  /* Image inside booking card */
+  .booking-thumb{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
 
-.booking-row {
-  min-height: 200px;                 
-  align-items: stretch 
-}
+  .booking-body{
+    padding:1.25rem 1.25rem 1rem;
+    display:flex;
+    flex-direction:column;
+    height:100%;
+  }
+  .booking-meta{ margin-top:.25rem; }
+  .booking-actions{ margin-top:auto; }
 
-.booking-thumb {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+  .booking-title{ margin-bottom:.25rem; line-height:1.3; }
+  .booking-badge{ align-self:flex-start; margin-left:.75rem; }
 
-
-.booking-body {
-  padding: 1.25rem 1.25rem 1rem;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.booking-meta { margin-top: .25rem; }
-.booking-actions {
-  margin-top: auto;                   
-}
-
-.booking-title {
-  margin-bottom: .25rem;
-  line-height: 1.3;
-}
-.booking-badge {
-  align-self: flex-start;
-  margin-left: .75rem;
-}
-
-/* Responsive */
-@media (max-width: 576px){
-  .booking-row { min-height: auto; }
-  .booking-body { padding: 1rem; }
-}
-
-  </style>
+  /* Responsive */
+  @media (max-width:576px){
+    .booking-row{ min-height:auto; }
+    .booking-body{ padding:1rem; }
+  }
+</style>
 </head>
 <body>
 
