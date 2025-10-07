@@ -61,6 +61,20 @@ class Comment(db.Model):
     def __repr__(self):
         return f"Comment: {self.text}"
 
-# booking & ticket data
+# booking data
 class Booking(db.Model):
     pass
+
+# ticket data
+class Ticket(db.Model):
+    __tablename__ = "tickets"
+    id = db.Column(db.Integer, primary_key=True)
+    # booking id (FK)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
+    ticket_price = db.Column(db.Float)
+    tickets_available = db.Column(db.Integer)
+
+    # string print method
+    def __repr__(self):
+        return f"Ticket: {self.integer}"
+
