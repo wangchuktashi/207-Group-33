@@ -1,165 +1,78 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SportsZone</title>
-  
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+{% extends "base.html" %}
+{% block title %}Event Details · SportsZone{% endblock %}
+
+{% block extra_css %}
 <style>
-  /* Event page hero banner */
-  .event-hero{
-    position:relative;
-    width:100%;
-    max-height:500px;
-    overflow:hidden;
-    border-radius:12px;
-    box-shadow:0 8px 24px rgba(0,0,0,0.25);
-    margin-top:10px;
-  }
-  .hero-banner{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-    filter:brightness(0.85);
-    transition:transform 0.5s ease;
-  }
-  .event-hero:hover .hero-banner{ transform:scale(1.05); }
-
-  .hero-overlay{
-    position:absolute;
-    bottom:20px;
-    left:20px;
-    color:#fff;
-    text-shadow:0 2px 6px rgba(0,0,0,0.7);
-  }
-  .hero-title{ font-size:2rem; font-weight:700; }
-  .hero-subtitle{ font-size:1rem; margin-top:.25rem; }
-
-  /* Sticky booking/info panel on large screens */
-  @media (min-width:992px){
-    .sticky-side{ position:sticky; top:1rem; }
-  }
+  .event-hero{position:relative;width:100%;max-height:500px;overflow:hidden;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);margin-top:10px;}
+  .hero-banner{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.85);transition:transform .5s ease;}
+  .event-hero:hover .hero-banner{transform:scale(1.05);}
+  .hero-overlay{position:absolute;bottom:20px;left:20px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.7);}
+  .hero-title{font-size:2rem;font-weight:700;}
+  .hero-subtitle{font-size:1rem;margin-top:.25rem;}
+  @media (min-width:992px){ .sticky-side{position:sticky;top:1rem;} }
 </style>
-</head>
-<body>
-  <header>
-    <!-- Navigation bar -->
- <nav class="navbar navbar-expand-lg navbar-dark sportszone-nav border-bottom sticky-top">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
-        <img src="static/img/logoweb.png" alt="SportsZone logo" width="50" height="40">
-        <span class="fw-bold">SPORTSZONE</span>
-      </a>
+{% endblock %}
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"
-              aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="nav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="create_event.html">Create Event</a></li>
-          <li class="nav-item"><a class="nav-link" href="booking.html">Booking History</a></li>
-
-          <!-- login and register -->
-          <li class="nav-item dropdown ms-3 mt-1">
-            <a class="nav-link d-flex align-items-center p-0" href="#" role="button"
-               data-bs-toggle="dropdown" aria-expanded="false" title="Account">
-              <img src="static/img/acct.jpg" alt="Account" width="35" height="30"
-                   class="rounded-circle" style="object-fit:cover;">
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="login.html">Login</a></li>
-              <li><a class="dropdown-item" href="register.html">Register</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-</header>
-
-<main class="container py-4">
-
-
-  <!-- Hero banner -->
+{% block body %}
+<!-- Hero banner -->
 <div class="event-hero mb-3">
-  <img src="static/img/engvsspain.jpg" alt="England vs Spain" class="img-fluid hero-banner">
+  <img src="{{ url_for('static', filename='img/engvsspain.jpg') }}" alt="England vs Spain" class="img-fluid hero-banner">
   <div class="hero-overlay">
     <h1 class="hero-title">England vs Spain</h1>
     <p class="hero-subtitle">UEFA Euro 2025 Qualifier · Wembley Stadium</p>
   </div>
 </div>
 
-
-  <!-- Teams row -->
-  <div class="d-flex justify-content-center align-items-center gap-4 mb-2">
-    <div class="text-center">
-      <img src="static/img/englandlogo.jpg" alt="England" width="65" class="mb-1" height="65">
-      <div class="small fw-bold">England</div>
-    </div>
-    <div class="h4 mb-0">vs</div>
-    <div class="text-center">
-      <img src="static/img/spainlogo.jpg" alt="Slovenia" width="60" class="mb-1">
-      <div class="small fw-bold">Spain</div>
-    </div>
+<!-- Teams -->
+<div class="d-flex justify-content-center align-items-center gap-4 mb-2">
+  <div class="text-center">
+    <img src="{{ url_for('static', filename='img/englandlogo.jpg') }}" alt="England" width="65" height="65" class="mb-1">
+    <div class="small fw-bold">England</div>
   </div>
-
-  <!-- Title, badges -->
-  <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
-    <h1 class="h3 mb-0">England vs Spain</h1>
-    <span class="badge text-bg-primary">Football</span>
-    <span class="badge text-bg-success badge-status">Open</span>
+  <div class="h4 mb-0">vs</div>
+  <div class="text-center">
+    <img src="{{ url_for('static', filename='img/spainlogo.jpg') }}" alt="Spain" width="60" class="mb-1">
+    <div class="small fw-bold">Spain</div>
   </div>
-  <p class="text-muted mb-0">Sat 18 Oct · 7:30–9:30 pm · Wembley Stadium, London</p>
-</header>
+</div>
+
+<!-- Title, badges -->
+<div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
+  <h1 class="h3 mb-0">England vs Spain</h1>
+  <span class="badge text-bg-primary">Football</span>
+  <span class="badge text-bg-success badge-status">Open</span>
+</div>
+<p class="text-muted mb-3 text-center">Sat 18 Oct · 7:30–9:30 pm · Wembley Stadium, London</p>
 
 <div class="row g-4">
   <!-- details, description -->
   <div class="col-lg-8">
-    <section class="mt-3 about-event">
-  <h2 class="h5 mb-3 text-primary fw-bold">About this event</h2>
-  <p class="lead">
-    <strong class="fw-bold">UEFA Euro 2025 Qualifier</strong> — Witness 
-    <span class="text-decoration-none fw-bold">England</span> take on 
-    <span class="text-decoration-none fw-bold">Spain</span> in a thrilling 
-    group-stage clash under the lights at Wembley.  
-  </p>
-  <p class="text-muted">
-    This is a family-friendly event with open seating, food trucks, and live entertainment. 
-    <br><strong>Gates open at 6:45 pm</strong> — arrive early to avoid queues.
-  </p>
+    <section class="mt-1 about-event">
+      <h2 class="h5 mb-3 text-primary fw-bold">About this event</h2>
+      <p class="lead">
+        <strong class="fw-bold">UEFA Euro 2025 Qualifier</strong> — Witness
+        <span class="fw-bold">England</span> take on <span class="fw-bold">Spain</span>
+        in a thrilling group-stage clash under the lights at Wembley.
+      </p>
+      <p class="text-muted">
+        Family-friendly event with open seating, food trucks, and live entertainment.
+        <br><strong>Gates open at 6:45 pm</strong> — arrive early to avoid queues.
+      </p>
 
-  <dl class="row small event-details mt-3">
-    <dt class="col-sm-3 fw-bold">Venue</dt>
-    <dd class="col-sm-9"> Wembley Stadium, London</dd>
-
-    <dt class="col-sm-3 fw-bold">Start</dt>
-    <dd class="col-sm-9"> Sat 18 Oct, 7:30 pm</dd>
-
-    <dt class="col-sm-3 fw-bold">End</dt>
-    <dd class="col-sm-9"> Sat 18 Oct, 9:30 pm</dd>
-
-    <dt class="col-sm-3 fw-bold">Home / Away</dt>
-    <dd class="col-sm-9">England vs Spain</dd>
-  </dl>
-</section>
+      <dl class="row small event-details mt-3">
+        <dt class="col-sm-3 fw-bold">Venue</dt><dd class="col-sm-9">Wembley Stadium, London</dd>
+        <dt class="col-sm-3 fw-bold">Start</dt><dd class="col-sm-9">Sat 18 Oct, 7:30 pm</dd>
+        <dt class="col-sm-3 fw-bold">End</dt><dd class="col-sm-9">Sat 18 Oct, 9:30 pm</dd>
+        <dt class="col-sm-3 fw-bold">Home / Away</dt><dd class="col-sm-9">England vs Spain</dd>
+      </dl>
+    </section>
 
     <!-- Comments -->
     <section class="mt-4">
       <h2 class="h5 mb-3">Comments</h2>
       <ul class="list-group mb-3">
-        <li class="list-group-item">
-          <b>Jake</b> <span class="text-muted small">· 12 Oct, 07:50</span>
-          <p class="mb-0">Is there on-site parking at Wembley?</p>
-        </li>
-        <li class="list-group-item">
-          <b>Tom</b> <span class="text-muted small">· 10 Oct, 18:05</span>
-          <p class="mb-0">Is Foden playing?</p>
-        </li>
+        <li class="list-group-item"><b>Jake</b> <span class="text-muted small">· 12 Oct, 07:50</span><p class="mb-0">Is there on-site parking at Wembley?</p></li>
+        <li class="list-group-item"><b>Tom</b> <span class="text-muted small">· 10 Oct, 18:05</span><p class="mb-0">Is Foden playing?</p></li>
       </ul>
 
       <form class="card p-3">
@@ -173,9 +86,7 @@
             <textarea class="form-control" rows="3" placeholder="Write your comment…" required></textarea>
           </div>
           <div class="col-12">
-            <button class="btn btn-outline-primary" type="submit" disabled>
-              Post Comment 
-            </button>
+            <button class="btn btn-outline-primary" type="submit" disabled>Post Comment</button>
           </div>
         </div>
       </form>
@@ -191,84 +102,29 @@
 
         <label class="form-label">Ticket type</label>
         <select class="form-select form-select-sm mb-2" aria-label="Ticket type">
-          <option selected>General</option>
-          <option>Student</option>
-          <option>VIP</option>
+          <option selected>General</option><option>Student</option><option>VIP</option>
         </select>
 
         <label class="form-label">Quantity</label>
         <input type="number" class="form-control form-control-sm mb-3" min="1" value="1">
 
-        <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#confirmModal">
-          Book Now
-        </button>
+        <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#confirmModal">Book Now</button>
       </div>
     </div>
   </aside>
 </div>
-</main>
 
 <!-- Confirmation modal -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Booking Confirmation</h5>
-        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body small text-muted">
-        Order ID: <b>#BK-12345</b><br>
-        Event: <b>England vs Spain</b><br>
-        Date/Time: Sat 18 Oct, 7:30 pm<br>
-        Venue: Wembley Stadium, London<br>
-        Type: General · Qty: 1
-      </div>
-      <div class="modal-footer">
-        <a class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</a>
-        <a class="btn btn-primary" href="booking.html">View Booking History</a>
-      </div>
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Booking Confirmation</h5><button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+    <div class="modal-body small text-muted">
+      Order ID: <b>#BK-12345</b><br>Event: <b>England vs Spain</b><br>Date/Time: Sat 18 Oct, 7:30 pm<br>Venue: Wembley Stadium, London<br>Type: General · Qty: 1
     </div>
-  </div>
+    <div class="modal-footer">
+      <a class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</a>
+      <a class="btn btn-primary" href="{{ url_for('events.list_events') }}">View Booking History</a>
+    </div>
+  </div></div>
 </div>
-
-<footer class="bg-dark text-light mt-5">
-  <div class="container py-4">
-    <div class="row g-4 align-items-start">
-      <div class="col-12 col-md-4">
-        <a class="d-inline-flex align-items-center gap-2 text-decoration-none text-light" href="index.html">
-          <img src="static/img/logoweb.png" alt="SportsZone" width="36" height="22">
-          <strong>SportsZone</strong>
-        </a>
-        <p class="text-secondary small mb-0 mt-2">Local sports. Easy booking.</p>
-      </div>
-      <div class="col-6 col-md-4">
-        <h6 class="text-uppercase small text-secondary mb-2">Quick links</h6>
-        <ul class="list-unstyled mb-0">
-          <li><a class="footer-link" href="index.html">Home</a></li>
-          <li><a class="footer-link" href="create_event.html">Create Event</a></li>
-          <li><a class="footer-link" href="booking.html">Booking History</a></li>
-          <li><a class="footer-link" href="event.html">Event Details</a></li>
-        </ul>
-      </div>
-      <div class="col-6 col-md-4">
-        <h6 class="text-uppercase small text-secondary mb-2">Connect</h6>
-        <div class="d-flex gap-3">
-          <a class="footer-icon" href="#"><img src="static/img/FB.jpg" width="20" alt="Facebook"></a>
-          <a class="footer-icon" href="#"><img src="static/img/insta.jpg" width="20" alt="Instagram"></a>
-          <a class="footer-icon" href="#"><img src="static/img/GMAIL.jpg" width="20" alt="Gmail"></a>
-          <a class="footer-icon" href="#"><img src="static/img/twitter.jpg" width="20" alt="X"></a>
-        </div>
-      </div>
-    </div>
-
-    <hr class="border-secondary-subtle my-4">
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2">
-      <small class="text-secondary">© 2025 SportsZone. All rights reserved.</small>
-      <small class="text-secondary">Terms · Privacy · Cookies</small>
-    </div>
-  </div>
-</footer>
-
- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-</body>
-</html>
+{% endblock %}
