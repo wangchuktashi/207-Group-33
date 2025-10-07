@@ -24,6 +24,18 @@ class Event(db.Model):
     def __repr__(self):
         return f"Name: {self.name}"
 
+# event status data
+class EventStatus(db.Model):
+    __tablename__ = "eventStatus"
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+    event_status = db.Column(db.String(32), index=True)
+    event_status_date = db.Column(db.DateTime, default=datetime.now())
+
+    # string print method
+    def __repr__(self):
+        return f"Name: {self.name}"
+
 # venue related data
 class Venue(db.Model):
     __tablename__ = "venue"
@@ -31,7 +43,7 @@ class Venue(db.Model):
     venue_name = db.Column(db.String(128))
     venue_address = db.Column(db.String(256), nullable=True)
     capacity = db.Column(db.Integer)
-    
+
     # string print method
     def __repr__(self):
         return f"Name: {self.name}"
