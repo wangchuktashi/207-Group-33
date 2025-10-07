@@ -4,7 +4,19 @@ from flask_login import UserMixin
 
 # user related data
 class User(db.Model, UserMixin):
-    pass
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), index=True, unique=True, nullable=False)
+    # assume mobile numbers with format such as 0423 456 132
+    mobile_number = db.Column(db.String(10), unique=True, nullable=False)
+    email_id = db.Column(db.String(100), index=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    # relation to call user.comments and comment.created_by
+    comments = db.relationship('Comment', backref='user')
+    
+    # string print method
+    def __repr__(self):
+        return f"Name: {self.name}"
 
 # sports event related data 
 class Event(db.Model):
