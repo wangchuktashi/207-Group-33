@@ -1,43 +1,100 @@
+from . import db
+from datetime import datetime
+from flask_login import UserMixin
 
-class Comment:
-    def __init__(self, user, text, created_at):
-        self.user = user
-        self.text = text
-        self.created_at = created_at
-
+# user related data
+class User(db.Model, UserMixin):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), index=True, unique=True, nullable=False)
+    # assume mobile numbers with format such as 0423 456 132
+    mobile_number = db.Column(db.String(10), unique=True, nullable=False)
+    email_id = db.Column(db.String(100), index=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    comments = db.relationship('Comment', backref='user')               # relation to call user.comments and comment.created_by
+    
+    # string print method
     def __repr__(self):
-        return f"User {self.user} · {self.created_at}\n{self.text}"
+        return f"Name: {self.name}"
 
+# sports event related data 
+class Event(db.Model):
+    __tablename__ = "events"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))          # relationship to event
+    venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'))        # relationship to venue
+    sports_type = db.Column(db.String(64), unique=True, index=True)
+    event_title = db.Column(db.String(256))
+    home_team_name = db.Column(db.String(64))
+    away_team_name = db.Column(db.String(64))
+    event_image = db.Column(db.String(64))
+    start_datetime = db.Column(db.DateTime, default=datetime.now())
+    end_datetime = db.Column(db.DateTime, default=datetime.now())
+    comments = db.relationship('Comment', backref='event')              # relation to call event.comments and comment.event
 
-class Event:
-    def __init__(
-        self, id, title, sport, venue, start_text, end_text,
-        image, hero_image, description, status
-    ):
-        self.id = id
-        self.title = title
-        self.sport = sport
-        self.venue = venue
-        self.start_text = start_text   # e.g. "Sat, Oct 18 • 7:30 PM"
-        self.end_text = end_text       # e.g. "9:30 PM"
-        self.image = image             # small/card image (in static/img/)
-        self.hero_image = hero_image   # big banner image (in static/img/)
-        self.description = description
-        self.status = status           # "Open" | "Sold Out" | "Cancelled" | "Inactive"
-        self.comments = []
-
-    def add_comment(self, comment: Comment):
-        self.comments.append(comment)
-
-    # Convenience for Bootstrap badge colour in your cards
-    @property
-    def badge(self):
-        return {
-            "Open": "success",
-            "Sold Out": "dark",
-            "Cancelled": "danger",
-            "Inactive": "secondary",
-        }.get(self.status, "secondary")
-
+    # string print method
     def __repr__(self):
-        return f"<Event {self.id} {self.title}>"
+        return f"Name: {self.name}"
+
+# event status data
+class EventStatus(db.Model):
+    __tablename__ = "eventStatus"
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))        # relationship to event
+    event_status = db.Column(db.String(32), index=True)
+    event_status_date = db.Column(db.DateTime, default=datetime.now())
+
+    # string print method
+    def __repr__(self):
+        return f"Name: {self.name}"
+
+# venue related data
+class Venue(db.Model):
+    __tablename__ = "venues"
+    id = db.Column(db.Integer, primary_key=True)
+    venue_name = db.Column(db.String(128))
+    venue_address = db.Column(db.String(256), nullable=True)
+    capacity = db.Column(db.Integer)
+
+    # string print method
+    def __repr__(self):
+        return f"Name: {self.name}"
+    
+# user comment data
+class Comment(db.Model):
+    __tablename__ = "comments"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))          # relationship to user
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
+    text = db.Column(db.String(400))
+    posted_date = db.Column(db.DateTime, default=datetime.now()) 
+
+    # string print method
+    def __repr__(self):
+        return f"Comment: {self.text}"
+
+# booking data
+class Booking(db.Model):
+    __tablename__ = "bookings"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))          # relationship to user
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
+    booking_date = db.Column(db.DateTime, default=datetime.now())
+    booking_quantity = db.Column(db.Integer)
+
+    # string print method
+    def __repr__(self):
+        return f"Booking: {self.integer}"
+
+# ticket data
+class Ticket(db.Model):
+    __tablename__ = "tickets"
+    id = db.Column(db.Integer, primary_key=True)
+    booking_id = db.Column(db.Integer, db.ForeignKey('bookings.id'))    # relationship to booking
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))        # relationship to event
+    ticket_price = db.Column(db.Float, nullable=False)  
+    tickets_available = db.Column(db.Integer)
+
+    # string print method
+    def __repr__(self):
+        return f"Ticket: {self.integer}"
