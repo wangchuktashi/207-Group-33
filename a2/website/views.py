@@ -1,86 +1,86 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
-from .models import Event, Comment  # plain Python classes (no DB)
+from datetime import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from . import db
+from .models import Event, EventStatus, Venue, Comment
 
-# All templates use 'main.*' endpoints
 mainbp = Blueprint('main', __name__)
 
-# ---------- sample data (in-memory) ----------
-def _sample_events():
-    e1 = Event(
-        id=1,
-        title="England vs Spain",
-        sport="Football",
-        venue="Wembley Stadium, London",
-        start_text="Sat, Oct 18 • 7:30 PM",
-        end_text="9:30 PM",
-        image="ft1.jpg",
-        hero_image="engvsspain.jpg",
-        description="UEFA Euro 2025 Qualifier — witness England take on Spain under the lights.",
-        status="Open",
-    )
-    e1.add_comment(Comment("Jake", "Is there on-site parking at Wembley?", "12 Oct, 07:50"))
-    e1.add_comment(Comment("Tom", "Is Foden playing?", "10 Oct, 18:05"))
-
-    e2 = Event(
-        id=2,
-        title="Miami Heats vs Brooklyn Nets",
-        sport="Basketball",
-        venue="Kaseya Center, Miami",
-        start_text="Sun, Oct 20 • 6:00 PM",
-        end_text="8:00 PM",
-        image="basketball1.jpg",
-        hero_image="basketball1.jpg",
-        description="NBA preseason face-off with fast breaks and big plays.",
-        status="Sold Out",
-    )
-
-    e3 = Event(
-        id=3,
-        title="Australia vs India",
-        sport="Cricket",
-        venue="MCG, Melbourne",
-        start_text="Sun, Nov 9 • 7:00 PM",
-        end_text="10:00 PM",
-        image="cricket1.jpg",
-        hero_image="cricket1.jpg",
-        description="ICC Finals — Australia battles India for ultimate cricket glory.",
-        status="Open",
-    )
-
-    return [e1, e2, e3]
-
-def list_events():
-    return _sample_events()
-
-def get_event(event_id: int):
-    return next((e for e in _sample_events() if e.id == event_id), None)
-
-# ---------- routes ----------
 @mainbp.route('/', endpoint='index')
 def index():
-    events = list_events()
+    # optional filters used by your toolbar
+    cat = (request.args.get('category') or 'all').lower()
+    st  = (request.args.get('status') or 'all').lower()
+    q   = (request.args.get('q') or '').strip().lower()
+
+    query = Event.query
+    if cat != 'all':
+        query = query.filter(Event.sports_type.ilike(cat))
+
+    events = query.order_by(Event.start_datetime.asc()).all()
+
+    # Apply status + search filters using the properties
+    def ok(e: Event) -> bool:
+        if st != 'all' and e.status.lower() != st:
+            return False
+        if q:
+            hay = f"{e.title} {e.sport} {e.venue_text}".lower()
+            if q not in hay:
+                return False
+        return True
+
+    events = [e for e in events if ok(e)]
     return render_template('index.html', title="SportsZone | Home", events=events)
 
 @mainbp.route('/event/<int:event_id>', endpoint='view_event')
 def view_event(event_id):
-    event = get_event(event_id)
-    if not event:
-        abort(404)
-    return render_template('event.html', title=event.title, event=event)
+    e = Event.query.get_or_404(event_id)
+    # event.html expects event.venue (string), so attach a transient attribute
+    e.venue = e.venue_text
+
+    # Comments already expose created_at via property
+    return render_template('event.html', title=e.title, event=e)
 
 @mainbp.route('/create-event', methods=['GET', 'POST'], endpoint='create_event')
 def create_event():
     if request.method == 'POST':
-        flash('Event saved (demo).')
-        return redirect(url_for('main.index'))
+        f = request.form
+
+        # upsert venue quickly
+        vname = (f.get('venue') or '').strip()
+        venue = Venue.query.filter_by(venue_name=vname).first()
+        if not venue:
+            venue = Venue(venue_name=vname, capacity=int(f.get('tickets') or 0))
+            db.session.add(venue)
+            db.session.flush()
+
+        def parse_dt(val):
+            try:    return datetime.strptime(val, "%Y-%m-%dT%H:%M")
+            except: return None
+
+        e = Event(
+            venue_id=venue.id if venue else None,
+            sports_type=f.get('sport'),
+            event_title=f.get('title'),
+            home_team_name=f.get('home'),
+            away_team_name=f.get('away'),
+            event_image=f.get('image') or "",
+            start_datetime=parse_dt(f.get('start')),
+            end_datetime=parse_dt(f.get('end')),
+        )
+        db.session.add(e)
+        db.session.flush()
+        db.session.add(EventStatus(event_id=e.id, event_status="Open"))
+        db.session.commit()
+
+        flash('Event saved.', 'success')
+        return redirect(url_for('main.view_event', event_id=e.id))
+
     return render_template('create_event.html', title="Create Event")
 
 @mainbp.route('/booking', endpoint='booking')
 def booking():
-    # optional: pass dummy orders later if you want
     return render_template('booking.html', title="Booking History")
 
-# (optional) placeholders so navbar items don’t 404 if you keep auth links later
 @mainbp.route('/login', endpoint='login')
 def login():
     return "<h1>Login - coming soon</h1>"

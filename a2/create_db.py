@@ -1,6 +1,8 @@
-from a2 import db, create_app
+from website import db, create_app
+import website.models  # ensure models are registered
+
 app = create_app()
-ctx = app.app_context()
-ctx.push()
-db.create_all()
-quit()
+with app.app_context():
+    print("DB URI:", db.engine.url)
+    db.create_all()
+    print("Tables created.")
