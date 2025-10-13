@@ -52,7 +52,6 @@
 <!-- Browse + Search toolbar -->
 <div class="container pt-4">
   <div class="toolbar shadow-sm rounded-4 px-3 py-3">
-    {# read current filters from query string (optional) #}
     {% set cat = request.args.get('category', 'all') %}
     {% set st  = request.args.get('status', 'all') %}
     {% set q   = request.args.get('q', '') %}
@@ -94,7 +93,8 @@
       <div class="col event" data-category="{{ e.sport|lower }}" data-status="{{ e.status|lower }}">
         <div class="card h-100">
           <div class="card-media">
-            <img src="{{ url_for('static', filename='img/' ~ e.image) }}" alt="{{ e.sport }}">
+            <img src="{{ url_for('static', filename='img/' ~ (e.image or 'placeholder.jpg')) }}"
+                 alt="{{ e.title or e.sport or 'Event' }}">
           </div>
           <div class="card-body d-flex flex-column">
             <div class="d-flex justify-content-between mb-2">
@@ -104,7 +104,7 @@
             <h5 class="card-title mb-1">{{ e.title }}</h5>
             <p class="card-text text-muted small mb-2">
               <strong>{{ e.start_text }}</strong><br>
-              {{ e.venue }}
+              {{ e.venue_text }}
             </p>
             <a href="{{ url_for('main.view_event', event_id=e.id) }}" class="btn btn-primary mt-auto">View Details</a>
           </div>

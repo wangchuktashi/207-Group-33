@@ -20,7 +20,7 @@
        alt="{{ event.title }}" class="img-fluid hero-banner">
   <div class="hero-overlay">
     <h1 class="hero-title">{{ event.title }}</h1>
-    <p class="hero-subtitle">{{ event.venue }}</p>
+    <p class="hero-subtitle">{{ event.venue_text }}</p>
   </div>
 </div>
 
@@ -45,7 +45,7 @@
   <span class="badge text-bg-{{ event.badge }} badge-status">{{ event.status }}</span>
 </div>
 <p class="text-muted mb-3 text-center">
-  {{ event.start_text }}{% if event.end_text %} – {{ event.end_text }}{% endif %} · {{ event.venue }}
+  {{ event.start_text }}{% if event.end_text %} – {{ event.end_text }}{% endif %} · {{ event.venue_text }}
 </p>
 
 <div class="row g-4">
@@ -56,7 +56,7 @@
       <p class="lead">{{ event.description }}</p>
 
       <dl class="row small event-details mt-3">
-        <dt class="col-sm-3 fw-bold">Venue</dt><dd class="col-sm-9">{{ event.venue }}</dd>
+        <dt class="col-sm-3 fw-bold">Venue</dt><dd class="col-sm-9">{{ event.venue_text }}</dd>
         <dt class="col-sm-3 fw-bold">Start</dt><dd class="col-sm-9">{{ event.start_text }}</dd>
         {% if event.end_text %}
         <dt class="col-sm-3 fw-bold">End</dt><dd class="col-sm-9">{{ event.end_text }}</dd>
@@ -73,7 +73,8 @@
       <ul class="list-group mb-3">
         {% for c in event.comments %}
           <li class="list-group-item">
-            <b>{{ c.user }}</b> <span class="text-muted small">· {{ c.created_at }}</span>
+            <b>{{ c.user.name if c.user else 'Anon' }}</b>
+            <span class="text-muted small">· {{ c.created_at }}</span>
             <p class="mb-0">{{ c.text }}</p>
           </li>
         {% else %}
@@ -140,7 +141,7 @@
       Order ID: <b>#BK-12345</b><br>
       Event: <b>{{ event.title }}</b><br>
       Date/Time: {{ event.start_text }}{% if event.end_text %} – {{ event.end_text }}{% endif %}<br>
-      Venue: {{ event.venue }}<br>
+      Venue: {{ event.venue_text }}<br>
       Type: General · Qty: 1
     </div>
     <div class="modal-footer">
