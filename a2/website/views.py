@@ -34,10 +34,7 @@ def index():
 @mainbp.route('/event/<int:event_id>', endpoint='view_event')
 def view_event(event_id):
     e = Event.query.get_or_404(event_id)
-    # event.html expects event.venue (string), so attach a transient attribute
-    e.venue = e.venue_text
 
-    # Comments already expose created_at via property
     return render_template('event.html', title=e.title, event=e)
 
 @mainbp.route('/create-event', methods=['GET', 'POST'], endpoint='create_event')
