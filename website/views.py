@@ -6,6 +6,8 @@ from .models import Event, Booking
 
 main_bp = Blueprint('main', __name__)
 
+bp = Blueprint('events', __name__, url_prefix='/events')
+
 @main_bp.route('/')
 def index():
     events = Event.query.all()  
@@ -62,3 +64,4 @@ def create_event():
 def booking_history():
     bookings = Booking.query.filter_by(user_id=current_user.id).all()
     return render_template('booking.html', bookings=bookings)
+
