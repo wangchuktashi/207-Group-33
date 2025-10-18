@@ -65,3 +65,32 @@ def logout():
     logout_user()
     flash("You have been logged out and sent to the home page.")
     return redirect(url_for('index'))
+
+auth_bp.route('/book', methods=('GET','POST'))
+def book():
+    from .forms import BookingForm   # local import breaks circularity
+    form = BookingForm()
+    if form.validate_on_submit():
+        # Process the booking
+        name = form.name.data
+        # Here you would typically save the booking information to the database
+        flash(f"Booking confirmed for {name}!")
+        return redirect(url_for('index'))
+    return render_template('booking.html', form=form)
+
+@auth_bp.route('/create_event', methods=('GET', 'POST'))
+def create_event():
+    from .forms import EventForm  # local import breaks circularity
+    form = EventForm()
+    if form.validate_on_submit():
+        title = form.title.data
+        date = form.date.data
+        # Here you would typically save the event information to the database
+        flash(f"Event '{title}' created for date {date}!")
+        return redirect(url_for('index'))
+    return render_template('create_event.html', form=form)
+
+@auth_bp.route('/')
+def index():
+    return 'events'
+
