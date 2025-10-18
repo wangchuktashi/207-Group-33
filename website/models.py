@@ -1,12 +1,7 @@
 from . import db
 from flask import Flask, render_template, url_for
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_login import UserMixin
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
-
-app = Flask(__name__)
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -18,6 +13,13 @@ class User(db.Model, UserMixin):
     events = db.relationship('Event', backref='creator', lazy=True)
     orders = db.relationship('Order', backref='user', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy=True)
+
+class Category(db.Model):
+    __tablename__ = 'categories'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    # optional relationship to Event
+    events = db.relationship('Event', backref='category_obj', lazy=True)
 
 class Event(db.Model):
     __tablename__ = 'events'
@@ -39,13 +41,19 @@ class Event(db.Model):
     comments = db.relationship('Comment', backref='event', lazy=True)
     orders = db.relationship('Order', backref='event', lazy=True)
 
+class Booking(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
+    name = db.Column(db.String(128), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
 class Comment(db.Model):
     __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     text = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.timezone.utc)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -54,5 +62,6 @@ class Order(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     quantity = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.timezone.utc)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
 
