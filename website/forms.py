@@ -19,3 +19,14 @@ class RegisterForm(FlaskForm):
 
     # submit button
     submit = SubmitField("Register")
+
+# this is the booking form
+class BookingForm(FlaskForm):
+    name = StringField('Name')
+    submit = SubmitField('Book')
+
+# this is the event form
+class EventForm(FlaskForm):
+    title = StringField('Title')
+    date = StringField('Date')
+    submit = SubmitField('Save')
