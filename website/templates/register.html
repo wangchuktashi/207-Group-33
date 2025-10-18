@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SportsZone</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+  <style>
+    /* body */ 
+    body { background-color:#a7f3d0; }
+
+    /* Navbar */
+    .sportszone-nav{ background:#134e4a; }
+    .sportszone-nav .nav-link{ color:#000; }
+    .sportszone-nav .nav-link:hover,
+    .sportszone-nav .nav-link.active{ color:#d58311c0; }
+    .sportszone-nav .navbar-brand{ color:#0e0e0f; }
+
+    /* Card  */
+    .card{
+      border:0;
+      border-radius:16px;
+      overflow:hidden;                  
+      box-shadow:0 10px 24px rgba(0,0,0,.08);
+      
+    }
+   .card:hover {
+  border: 2px solid #134e4a;  
+    }
+
+    /* card's media */
+    .card-media{
+      aspect-ratio:16/9;                 
+      background:#fff;                  
+    }
+    .card-media > img{
+      width:100%;
+      height:100%;
+      object-fit:contain;                
+      display:block;
+      padding:6px;                       
+    }
+
+    /* carousel */
+    .hero-img {
+  width: 100%;
+  height: 65vh;          
+  object-fit: cover;     
+  object-position: top;
+}
+    /* Toolbar box(Category, search, status) */
+.toolbar {
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(0,0,0,.05);
+    }
+
+/* Category buttons */
+.cat-btn {
+  color: #134e4a;
+  background: #e6f7f3;
+  border: 1px solid #cceee7;
+  border-radius: 20px;
+  padding: 0.35rem 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+.cat-btn:hover {
+  background: #cceee7;
+  border-color: #99ddd1;
+}
+.cat-btn.active {
+  background: #134e4a;
+  color: #fff;
+  border-color: #134e4a;
+}
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    resize: vertical;
+  }
+
+/* Search box and button */
+.search-box {
+  border-radius: 20px 0 0 20px;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .toolbar form {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+}
+
+  </style>
+
+  <script>
+        function handleSubmit(event) {
+            event.preventDefault();  // Prevent the default form submission
+            // Perform any form validation or submission logic here
+            
+            // Redirect to the success page
+            window.location.href = '{{ url_for("success") }}';
+        }
+  </script>
+</head>
+
+<body>
+<header>
+<!-- Navigation bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sportszone-nav border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <img src="static/img/logoweb.png" alt="Sportszone logo" width="50" height="40">
+        <span class="fw-bold">SPORTSZONE</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"
+              aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="create_event.html">Create Event</a></li>
+          <li class="nav-item"><a class="nav-link" href="booking.html">Booking History</a></li>
+
+          <!-- login and register -->
+          <li class="nav-item dropdown ms-3 mt-1">
+            <a class="nav-link d-flex align-items-center p-0" href="#" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false" title="Account">
+              <img src="static/img/acct.jpg" alt="Account" width="35" height="30"
+                   class="rounded-circle" style="object-fit:cover;">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="login.html">Login</a></li>
+              <li><a class="dropdown-item" href="register.html">Register</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="login-container">
+        <form class="register-form" onsubmit="handleSubmit(event)">
+            <h2>Registration</h2>
+
+            <label for="fname">First Name:</label>
+            <input type="text" placeholder="Enter your Firstname" required>
+
+            <label for="lname">Last Name:</label>
+            <input type="text" placeholder="Enter your Lastname" required>
+            
+            <label for="username">Username:</label>
+            <input type="text" placeholder="Enter your username" required>
+            
+            <label for="password">Password:</label>
+            <input type="text" placeholder="Enter your password" required>
+            
+            <label for="email">Email:</label>
+            <input type="email" placeholder="Enter your email" required>
+            
+            <label for="phone">Phone Number:</label>
+            <input type="tel" placeholder="Enter your Phone Number">
+            
+            <div class="col-12 d-flex gap-2">
+            <button type="button" class="btn btn-primary"
+                    data-bs-toggle="modal" data-bs-target="#savedModal">
+              Register
+            </button>
+            </div>
+        </form>
+</div>
+
+<div class="modal fade" id="savedModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Registered</h5>
+        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body small text-muted">
+        Registered Successfully.<br>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary" href="index.html">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="bg-dark text-light mt-5">  
+  <div class="container py-4">
+    <div class="row g-4 align-items-start">
+      <div class="col-12 col-md-4">
+        <a class="d-inline-flex align-items-center gap-2 text-decoration-none text-light" href="index.html">
+          <img src="static/img/logoweb.png" alt="SportsZone" width="36" height="22">
+          <strong>SportsZone</strong>
+        </a>
+        <p class="text-secondary small mb-0 mt-2">Local sports. Easy booking.</p>
+      </div>
+      <div class="col-6 col-md-4">
+        <h6 class="text-uppercase small text-secondary mb-2">Quick links</h6>
+        <ul class="list-unstyled mb-0">
+          <li><a class="footer-link" href="index.html">Home</a></li>
+          <li><a class="footer-link" href="create_event.html">Create Event</a></li>
+          <li><a class="footer-link" href="booking.html">Booking History</a></li>
+          <li><a class="footer-link" href="event.html">Event Details</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md-4">
+        <h6 class="text-uppercase small text-secondary mb-2">Connect</h6>
+        <div class="d-flex gap-3">
+          <a class="footer-icon" href="#"><img src="static/img/FB.jpg" width="20" alt="Facebook"></a>
+          <a class="footer-icon" href="#"><img src="static/img/insta.jpg" width="20" alt="Instagram"></a>
+          <a class="footer-icon" href="#"><img src="static/img/GMAIL.jpg" width="20" alt="Gmail"></a>
+          <a class="footer-icon" href="#"><img src="static/img/twitter.jpg" width="20" alt="X"></a>
+        </div>
+      </div>
+    </div>
+
+    <hr class="border-secondary-subtle my-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2">
+      <small class="text-secondary">© 2025 SportsZone. All rights reserved.</small>
+      <small class="text-secondary">Terms · Privacy · Cookies</small>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>

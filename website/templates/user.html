@@ -1,0 +1,85 @@
+{% include "base.html" %}
+{% from "bootstrap5/form.html" import render_form %}
+{% from "bootstrap5/form.html" import render_field %}
+
+{% block navbar %}
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="create_event.html">Create Event</a></li>
+                <li class="nav-item"><a class="nav-link" href="booking.html">Booking History</a></li>
+{% endblock %}
+{% block loginregister %}
+{% if heading|lower =='login' %}
+
+                <a class="nav-item nav-link" href="{{ url_for('auth.register') }}">Register</a>
+                <a class="nav-item nav-link active" href="{{ url_for('auth.login') }}">Log In</a>
+{% else %}
+                <a class="nav-item nav-link active" href="{{ url_for('auth.register') }}">Register</a>
+                <a class="nav-item nav-link" href="{{ url_for('auth.login') }}">Log In</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<br>
+<div class="page-header">
+    <h1 class = text-center>{{heading}}</h1>
+</div>
+
+<!-- Form rendering is simple and easy if using WTForms and Bootstrap -->
+<div class = "container-fluid">
+    <div class = "row justify-content-center">
+        <div class="mb-3 col-sm-6 form-group">
+            {{ render_form(form) }}
+        </div> 
+    </div>
+
+<!-- When you have Login form, then show the user a link to register -->
+{% if heading|lower =='login' %}
+    <div class = "row justify-content-center">
+        <div class="mb-3 col-sm-6 form-group">
+            <p>New user? <a href="{{ url_for('auth.register') }}">Click here to register</a>.</p>
+        </div>
+    </div>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="bg-dark text-light mt-5">
+  <div class="container py-4">
+    <div class="row g-4 align-items-start">
+      <div class="col-12 col-md-4">
+        <a class="d-inline-flex align-items-center gap-2 text-decoration-none text-light" href="index.html">
+          <img src="static/img/logoweb.png" alt="SportsZone" width="36" height="22">
+          <strong>SportsZone</strong>
+        </a>
+        <p class="text-secondary small mb-0 mt-2">Local sports. Easy booking.</p>
+      </div>
+      <div class="col-6 col-md-4">
+        <h6 class="text-uppercase small text-secondary mb-2">Quick links</h6>
+        <ul class="list-unstyled mb-0">
+          <li><a class="footer-link" href="index.html">Home</a></li>
+          <li><a class="footer-link" href="create_event.html">Create Event</a></li>
+          <li><a class="footer-link" href="booking.html">Booking History</a></li>
+          <li><a class="footer-link" href="event.html">Event Details</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md-4">
+        <h6 class="text-uppercase small text-secondary mb-2">Connect</h6>
+        <div class="d-flex gap-3">
+          <a class="footer-icon" href="#"><img src="static/img/FB.jpg" width="20" alt="Facebook"></a>
+          <a class="footer-icon" href="#"><img src="static/img/insta.jpg" width="20" alt="Instagram"></a>
+          <a class="footer-icon" href="#"><img src="static/img/GMAIL.jpg" width="20" alt="Gmail"></a>
+          <a class="footer-icon" href="#"><img src="static/img/twitter.jpg" width="20" alt="X"></a>
+        </div>
+      </div>
+    </div>
+
+    <hr class="border-secondary-subtle my-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2">
+      <small class="text-secondary">© 2025 SportsZone. All rights reserved.</small>
+      <small class="text-secondary">Terms · Privacy · Cookies</small>
+    </div>
+  </div>
+</footer>
+{% endblock %}
