@@ -5,16 +5,20 @@ from . import db
 # -------------------- Users --------------------
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), index=True, unique=True, nullable=False)
-    # allow formats like "0423 456 132" -> make longer than 10
-    mobile_number = db.Column(db.String(20), unique=True, nullable=False)
-    email_id = db.Column(db.String(100), index=True, unique=True, nullable=False)
+    first_name = db.Column(db.String(100), nullable=False)
+    surname = db.Column(db.String(100), nullable=False)
+    email_id = db.Column(db.String(100), unique=True, index=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    comments = db.relationship('Comment', backref='user', lazy=True)
+    mobile_number = db.Column(db.String(15), unique=True, nullable=False)
+    street_address = db.Column(db.String(255), nullable=False)
+
+    comments = db.relationship('Comment', backref='user')
 
     def __repr__(self):
-        return f"<User {self.name}>"
+        return f"{self.first_name} {self.surname}"
+
 
 # -------------------- Venues --------------------
 class Venue(db.Model):

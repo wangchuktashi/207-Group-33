@@ -74,18 +74,19 @@ def create_event():
 
     return render_template('create_event.html', title="Create Event")
 
+
 @mainbp.route('/booking', endpoint='booking')
 def booking():
     return render_template('booking.html', title="Booking History")
 
-@mainbp.route('/login', endpoint='login')
-def login():
-    return "<h1>Login - coming soon</h1>"
+#@mainbp.route('/login', endpoint='login')
+#def login():
+   # return "<h1>Login - coming soon</h1>"
 
-@mainbp.route('/register', endpoint='register')
-def register():
-    return "<h1>Register - coming soon</h1>"
+#@mainbp.route('/register', endpoint='register')
+#def register():
+  #  return "<h1>Register - coming soon</h1>"
 
-@mainbp.route('/logout', endpoint='logout')
-def logout():
-    return redirect(url_for('main.index'))
+#@mainbp.route('/logout', endpoint='logout')
+#def logout():
+ #   return redirect(url_for('main.index'))
