@@ -10,7 +10,11 @@
         <h1>Create Event</h1>
         <p>Enter the event details below.</p>
 
-        {{ render_form(form) }}
+        <!-- to prevent double clicks -->
+        <form method="post" enctype="multipart/form-data" onsubmit="this.querySelector('button[type=submit]').disabled=true;">
+          {{ form.hidden_tag() }}
+          {{ render_form(form) }}
+        </form>
 
         
       </div>

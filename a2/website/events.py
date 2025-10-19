@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from .models import Event, Comment
+from .models import Event, Comment, Venue
 from .forms import EventForm, CommentForm
 from . import db
 import os
@@ -23,24 +23,35 @@ def create_event():
     if form.reset.data:
         return redirect(url_for('event.create_event'))
     
-    if form.validate_on_submit():
-        # call the function that checks and returns image
+    if form.validate_on_submit() and form.submit.data:
+        # save upload and get DB path
         db_file_path = check_upload_file(form)
+
+        # ensure venue exists (model stores venue_id)
+        venue_name = (form.venue.data or "").strip()
+        venue = None
+        if venue_name:
+            venue = Venue.query.filter_by(venue_name=venue_name).first()
+            if not venue:
+                venue = Venue(venue_name=venue_name)
+                db.session.add(venue)
+                db.session.flush()   # assign id without committing
+
+        # map form fields to Event model columns (use actual column names)
         event = Event(
-            title = form.title.data,
-            sport_type = form.sport_type.data,
-            home_team = form.home_team.data,
-            away_team = form.away_team.data,
+            sports_type = form.sport_type.data,
+            event_title = form.event_title.data,
+            home_team_name = form.home_team.data,
+            away_team_name = form.away_team.data,
             start_datetime = form.start_datetime.data,
             end_datetime = form.end_datetime.data,
-            venue = form.venue.data,
-            total_tickets = form.total_tickets.data,
-            description = form.description.data,
-            image = db_file_path
+            event_image = db_file_path
         )
+        if venue:
+            event.venue = venue   # sets venue_id via relationship
+
         # add the object to the db session
         db.session.add(event)
-        # commit to the database
         db.session.commit()
         print('Successfully created new event', 'success')
         # Always end with redirect when form is valid
@@ -49,16 +60,27 @@ def create_event():
     return render_template('create_event.html', form=form)
 
 def check_upload_file(form):
-  # get file data from form  
-  fp = form.image.data
-  filename = fp.filename
-  # get the current path of the module file… store image file relative to this path  
-  BASE_PATH = os.path.dirname(__file__)
-  # upload file location – directory of this file/static/image
-  upload_path = os.path.join(BASE_PATH,'static/img',secure_filename(filename))
-  # store relative path in DB as image location in HTML is relative
-  db_upload_path = 'static/img' + secure_filename(filename)
-  # save the file and return the db upload path  
-  fp.save(upload_path)
-  return db_upload_path
+    file_field = getattr(form, 'image', None)
+    if not file_field:
+        return None
+    fp = file_field.data
+    if not fp:
+        return None
+    filename = secure_filename(getattr(fp, 'filename', '') or '')
+    if not filename:
+        return None
+
+    base_dir = os.path.dirname(__file__)
+    upload_dir = os.path.join(base_dir, 'static', 'img')
+    os.makedirs(upload_dir, exist_ok=True)
+
+    upload_path = os.path.join(upload_dir, filename)
+    try:
+        fp.save(upload_path)
+    except Exception as e:
+        print("Error saving upload:", e)
+        return None
+
+    # return only the filename for storage
+    return filename
 
