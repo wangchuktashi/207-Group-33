@@ -40,8 +40,8 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link {% if request.endpoint=='main.create_event' %}active{% endif %}"
-             href="{{ url_for('main.create_event') }}">Create Event</a>
+          <a class="nav-link {% if request.endpoint in ['event.create_event', 'event.create'] %}active{% endif %}"
+             href="{{ url_for('event.create_event') }}">Create Event</a>
         </li>
 
         <li class="nav-item">
@@ -109,7 +109,7 @@
         <h6 class="text-uppercase small text-secondary mb-2">Quick links</h6>
         <ul class="list-unstyled mb-0">
           <li><a class="footer-link" href="{{ url_for('main.index') }}">Home</a></li>
-          <li><a class="footer-link" href="{{ url_for('main.create_event') }}">Create Event</a></li>
+          <li><a class="footer-link" href="{{ url_for('event.create_event') }}">Create Event</a></li>
           <li><a class="footer-link" href="{{ url_for('main.booking') }}">Booking History</a></li>
         </ul>
       </div>

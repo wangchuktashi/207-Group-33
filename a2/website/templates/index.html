@@ -106,7 +106,7 @@
               <strong>{{ e.start_text }}</strong><br>
               {{ e.venue_text }}
             </p>
-            <a href="{{ url_for('main.view_event', event_id=e.id) }}" class="btn btn-primary mt-auto">View Details</a>
+            <a href="{{ url_for('event.view_event', event_id=e.id) }}" class="btn btn-primary mt-auto">View Details</a>
           </div>
         </div>
       </div>

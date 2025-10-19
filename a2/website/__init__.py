@@ -15,7 +15,11 @@ def create_app():
     db.init_app(app)
     Bootstrap5(app)
 
-# --- Flask-Login ---
+    # configure upload folder
+    UPLOAD_FOLDER = '/static/image'
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+    # --- Flask-Login ---
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"   # redirect here if not logged in
     login_manager.init_app(app)
@@ -31,6 +35,9 @@ def create_app():
 
     from . import auth
     app.register_blueprint(auth.auth_bp)
+
+    from . import events
+    app.register_blueprint(events.event_bp)
 
     # --- Error Handling ---
     @app.errorhandler(404)
