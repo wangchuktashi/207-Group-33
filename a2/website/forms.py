@@ -1,6 +1,6 @@
 # website/forms.py
 from flask_wtf import FlaskForm
-from wtforms.fields import TextAreaField, SubmitField, StringField, PasswordField, SelectField, DateField
+from wtforms.fields import TextAreaField, IntegerField,  SubmitField, StringField, PasswordField, SelectField, DateTimeLocalField
 from wtforms.validators import InputRequired, Length, Email, EqualTo, AnyOf, NumberRange
 from flask_wtf.file import FileRequired, FileField, FileAllowed
 from datetime import datetime
@@ -38,7 +38,7 @@ class RegisterForm(FlaskForm):
 
 # event form
 class EventForm(FlaskForm):
-    event_title = StringField('Event Title', validators=[InputRequired()])
+    event_title = StringField('Event Title', validators=[InputRequired(), Length(max=256)])
     sport_type = SelectField(
         'Sport Type',
         choices=[
@@ -55,21 +55,17 @@ class EventForm(FlaskForm):
                   message='Invalid sport selected')
         ]
     )
-    home_team = StringField('Home Team', validators=[InputRequired()])
-    away_team = StringField('Away Team', validators=[InputRequired()])
-    start_datetime = DateField('Event Date', format='%Y-%m-%d', 
+    home_team = StringField('Home Team', validators=[InputRequired(),  Length(max=64)])
+    away_team = StringField('Away Team', validators=[InputRequired(),  Length(max=64)])
+    start_datetime = DateTimeLocalField('Event Date', format='%Y-%m-%dT%H:%M', 
                                validators=[InputRequired(message='Please choose a start date and time')])
-    end_datetime = DateField('Event Date', format='%Y-%m-%d',
+    end_datetime = DateTimeLocalField('Event Date', format='%Y-%m-%dT%H:%M',
                            validators=[InputRequired(message='Please choose an end date time.')])
-    venue = StringField('Venue', validators=[InputRequired()])
-    total_tickets = SelectField(
+    venue = StringField('Venue', validators=[InputRequired(), Length(max=128)])
+    total_tickets = IntegerField(
         'Total Tickets',
-        coerce=int,
-        choices=[(i, str(i)) for i in range(1, 50001)],
-        validators=[
-            InputRequired(message='Please select number of tickets'),
-            NumberRange(min=1, max=50000, message='Select between 1 and 50000 tickets')
-        ]
+        validators=[InputRequired(), NumberRange(min=1, max=50000)],
+        render_kw={'min': 1, 'max': 50000, 'step': 1}
     )
     image = FileField('Event Image', validators=[
         FileRequired(message = 'Image cannot be empty'),
