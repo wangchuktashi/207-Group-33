@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from . import db
+from flask_login import current_user, login_required
 from .models import Event, EventStatus, Venue, Comment
 
 mainbp = Blueprint('main', __name__)
@@ -38,6 +39,7 @@ def view_event(event_id):
     return render_template('event.html', title=e.title, event=e)
 
 @mainbp.route('/create-event', methods=['GET', 'POST'], endpoint='create_event')
+@login_required  
 def create_event():
     if request.method == 'POST':
         f = request.form
@@ -76,17 +78,6 @@ def create_event():
 
 
 @mainbp.route('/booking', endpoint='booking')
+@login_required
 def booking():
     return render_template('booking.html', title="Booking History")
-
-#@mainbp.route('/login', endpoint='login')
-#def login():
-   # return "<h1>Login - coming soon</h1>"
-
-#@mainbp.route('/register', endpoint='register')
-#def register():
-  #  return "<h1>Register - coming soon</h1>"
-
-#@mainbp.route('/logout', endpoint='logout')
-#def logout():
- #   return redirect(url_for('main.index'))
