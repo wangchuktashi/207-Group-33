@@ -1,5 +1,5 @@
-from website import db, create_app
-import website.models  # ensure models are registered
+from SportsZone import db, create_app
+import SportsZone.models  # ensure models are registered
 
 app = create_app()
 with app.app_context():
