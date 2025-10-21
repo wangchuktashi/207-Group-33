@@ -32,6 +32,7 @@ def create_app():
     from . import auth
     app.register_blueprint(auth.auth_bp)
 
+
     # --- Error Handling ---
     @app.errorhandler(404)
     def not_found_error(error):
