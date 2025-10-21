@@ -1,5 +1,5 @@
 # import flask - from 'package' import 'Class'
-from flask import Flask 
+from flask import Flask, render_template
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -45,6 +45,21 @@ def create_app():
 
     from .views import bp as events_bp
     app.register_blueprint(events_bp)
-    
+
+     # Error handlers — always render HTML templates for errors 
+    @app.errorhandler(404)
+    def not_found_error(error):
+        return render_template('404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        # for 500 we also roll back the session if SQLAlchemy is used
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
+        return render_template('500.html'), 500
+
     return app
+
 
