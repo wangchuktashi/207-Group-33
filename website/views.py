@@ -13,6 +13,11 @@ def index():
     events = Event.query.all()  
     return render_template('Index.html', events=events)
 
+@main_bp.route('/index.html')
+def index_html():
+    events = Event.query.all()
+    return render_template('Index.html', events=events)
+
 @main_bp.route('/event/<int:event_id>', methods=['GET', 'POST'])
 def event_details(event_id):
     event = Event.query.get_or_404(event_id)
@@ -59,9 +64,30 @@ def create_event():
     return render_template('create_event.html', form=form)
 
 
-@main_bp.route('/booking-history')
+@main_bp.route('/booking.html')
 @login_required
-def booking_history():
+def booking_html():
     bookings = Booking.query.filter_by(user_id=current_user.id).all()
     return render_template('booking.html', bookings=bookings)
+
+@main_bp.route('/login', endpoint='login')
+def login():
+    # support direct /login and redirect to auth blueprint
+    return redirect(url_for('auth.login'))
+
+@main_bp.route('/login.html')
+def login_html():
+    events = Event.query.all()
+    return render_template('login.html', events=events)
+
+@main_bp.route('/register.html')
+def register_html():
+    events = Event.query.all()
+    return render_template('register.html', events=events)
+
+@main_bp.route('/logout')
+def logout():
+    events = Event.query.all()
+    return render_template('Index.html', events=events)
+
 
