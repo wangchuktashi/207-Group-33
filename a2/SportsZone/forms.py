@@ -1,4 +1,3 @@
-# website/forms.py
 from flask_wtf import FlaskForm
 from wtforms.fields import TextAreaField, IntegerField,  SubmitField, StringField, PasswordField, SelectField, DateTimeLocalField
 from wtforms.validators import InputRequired, Length, Email, EqualTo, AnyOf, NumberRange
@@ -19,7 +18,6 @@ class RegisterForm(FlaskForm):
     surname = StringField("Surname", validators=[InputRequired(), Length(max=100)])
     email_id = StringField("Email", validators=[InputRequired(), Email(), Length(max=100)])
 
-    # No regex: just require presence + sensible length range
     mobile_number = StringField(
         "Contact number",
         validators=[InputRequired(), Length(min=8, max=15, message="Enter 8–15 characters")]
