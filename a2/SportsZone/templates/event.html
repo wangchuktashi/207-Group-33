@@ -28,13 +28,9 @@
 {% set teams = event.title.split(' vs ') %}
 {% if teams|length == 2 %}
 <div class="d-flex justify-content-center align-items-center gap-4 mb-2">
-  <div class="text-center">
-    <div class="small fw-bold">{{ teams[0] }}</div>
-  </div>
+  <div class="text-center"><div class="small fw-bold">{{ teams[0] }}</div></div>
   <div class="h4 mb-0">vs</div>
-  <div class="text-center">
-    <div class="small fw-bold">{{ teams[1] }}</div>
-  </div>
+  <div class="text-center"><div class="small fw-bold">{{ teams[1] }}</div></div>
 </div>
 {% endif %}
 
@@ -115,11 +111,14 @@
 
           <label class="form-label">Ticket type</label>
           <select class="form-select form-select-sm mb-2" aria-label="Ticket type" {% if not can_book %}disabled{% endif %}>
-            <option selected>General</option><option>Student</option><option>VIP</option>
+            <option selected>General</option>
+            <option>Student</option>
+            <option>VIP</option>
           </select>
 
-          <label class="form-label">Quantity</label>
-          <input type="number" name="quantity" class="form-control form-control-sm mb-3" min="1" max="100" value="1" {% if not can_book %}disabled{% endif %}>
+          <label class="form-label">Quantity (1–100)</label>
+          <input type="number" name="quantity" class="form-control form-control-sm mb-3"
+                 min="1" max="100" value="1" {% if not can_book %}disabled{% endif %}>
 
           <button type="submit" class="btn btn-lg btn-primary w-100" {% if not can_book %}disabled aria-disabled="true"{% endif %}>
             Book Now
