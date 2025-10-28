@@ -102,52 +102,39 @@
   </div>
 
   <!-- Booking panel -->
-  <aside class="col-lg-4">
-    {% set can_book = (event.status == 'Open') %}
-    <div class="card shadow-sm sticky-side">
-      <div class="card-body">
-        <h2 class="h6 mb-3">Book Tickets</h2>
-        <div class="small text-muted mb-2">
-          {% if can_book %}Tickets available: <b>120</b>
-          {% else %}<b>Booking unavailable ({{ event.status }})</b>{% endif %}
-        </div>
+<aside class="col-lg-4">
+  {% set can_book = (event.status == 'Open') %}
+  <div class="card shadow-sm sticky-side">
+    <div class="card-body">
+      <h2 class="h6 mb-3">Book Tickets</h2>
 
-        <label class="form-label">Ticket type</label>
-        <select class="form-select form-select-sm mb-2" aria-label="Ticket type" {% if not can_book %}disabled{% endif %}>
-          <option selected>General</option><option>Student</option><option>VIP</option>
-        </select>
-
-        <label class="form-label">Quantity</label>
-        <input type="number" class="form-control form-control-sm mb-3" min="1" value="1" {% if not can_book %}disabled{% endif %}>
-
-        <button class="btn btn-primary w-100 mb-2"
-                data-bs-toggle="modal" data-bs-target="#confirmModal"
-                {% if not can_book %}disabled aria-disabled="true"{% endif %}>
-          Book Now
-        </button>
+      <div class="small text-muted mb-2">
+        {% if can_book %}
+          Tickets available: <b>120</b>
+        {% else %}
+          <b>Booking unavailable ({{ event.status }})</b>
+        {% endif %}
       </div>
-    </div>
-  </aside>
-</div>
 
-<!-- Confirmation modal -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog"><div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title">Booking Confirmation</h5>
-      <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <form method="POST" action="{{ url_for('main.create_booking') }}">
+        {{ form.csrf_token }}
+
+        {{ form.event_id }}
+
+        <label class="form-label">{{ form.ticket_type.label }}</label>
+        {{ form.ticket_type(class="form-select form-select-sm mb-2", disabled=not can_book) }}
+
+        <label class="form-label">{{ form.quantity.label }}</label>
+        {{ form.quantity(class="form-control form-control-sm mb-3", min="1", disabled=not can_book) }}
+
+        {{ form.submit(class="btn btn-primary w-100 mb-2", disabled=not can_book) }}
+      </form>
+
+      <a class="btn btn-outline-secondary w-100"
+         href="{{ url_for('main.booking') }}">
+        View Booking History
+      </a>
     </div>
-    <div class="modal-body small text-muted">
-      Order ID: <b>#BK-12345</b><br>
-      Event: <b>{{ event.title }}</b><br>
-      Date/Time: {{ event.start_text }}{% if event.end_text %} – {{ event.end_text }}{% endif %}<br>
-      Venue: {{ event.venue_text }}<br>
-      Type: General · Qty: 1
-    </div>
-    <div class="modal-footer">
-      <a class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</a>
-      <a class="btn btn-primary" href="{{ url_for('main.booking') }}">View Booking History</a>
-    </div>
-  </div></div>
-</div>
+  </div>
+</aside>
 {% endblock %}

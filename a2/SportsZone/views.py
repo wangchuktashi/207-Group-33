@@ -1,18 +1,18 @@
 # website/views.py
 import os
 from datetime import datetime
-from flask import Blueprint, render_template, request, redirect, url_for
-from flask_login import login_required
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from . import db
-from .models import Event, EventStatus, Venue, Comment  # (Comment is here if you add posting later)
-from .forms import EventForm, CommentForm                # EventForm is used below
+from .models import Event, EventStatus, Venue, Comment, Booking # (Comment is here if you add posting later)
+from .forms import EventForm, CommentForm , BookingForm               # EventForm is used below
 
-mainbp = Blueprint('main', __name__)
+main_bp = Blueprint('main', __name__)
 
 # ---------- Home (public) ----------
-@mainbp.route('/', endpoint='index')
+@main_bp.route('/', endpoint='index')
 def index():
     # optional filters used by your toolbar
     cat = (request.args.get('category') or 'all').lower()
@@ -39,13 +39,17 @@ def index():
     return render_template('index.html', title="SportsZone | Home", events=events)
 
 # ---------- View a single event (public) ----------
-@mainbp.route('/event/<int:event_id>', endpoint='view_event')
+@main_bp.route('/event/<int:event_id>', endpoint='view_event')
 def view_event(event_id):
     e = Event.query.get_or_404(event_id)
-    return render_template('event.html', title=e.title, event=e)
 
+    form = BookingForm()
+    form.event_id.data = e.id  # pre-fill hidden field
+    form.quantity.data = 1     # default
+
+    return render_template('event.html', title=e.title, event=e, form=form)
 # ---------- Create event via WTForms + upload (login required) ----------
-@mainbp.route('/create-event', methods=['GET', 'POST'], endpoint='create_event')
+@main_bp.route('/create-event', methods=['GET', 'POST'], endpoint='create_event')
 @login_required
 def create_event():
     form = EventForm()
@@ -92,10 +96,78 @@ def create_event():
     return render_template('create_event.html', form=form, title="Create Event")
 
 # ---------- Booking page (leave as-is) ----------
-@mainbp.route('/booking', endpoint='booking')
+@main_bp.route('/booking', methods=['GET'], endpoint='booking')
 @login_required
 def booking():
-    return render_template('booking.html', title="Booking History")
+    # join Bookings -> Event -> Venue so we can display some details
+    rows = (
+        db.session.query(Booking, Event, Venue)
+        .filter(Booking.user_id == current_user.id)
+        .join(Event, Booking.event_id == Event.id, isouter=True)
+        .join(Venue, Event.venue_id == Venue.id, isouter=True)
+        .order_by(Booking.booking_date.desc())
+        .all()
+    )
+
+    bookings = []
+    for b, e, v in rows:
+        bookings.append({
+            "id": b.id,
+            "date": (
+                b.booking_date.strftime("%d %b %Y, %I:%M %p")
+                if b.booking_date else ""
+            ),
+            "qty": b.booking_quantity or 1,
+            "event": {
+                "id": e.id if e else None,
+                "title": (
+                    e.event_title
+                    or f"{e.home_team_name} vs {e.away_team_name}"
+                ) if e else "Unknown Event",
+                "start_text": getattr(e, "start_text", ""),   # safe fallback
+                "end_text": getattr(e, "end_text", ""),
+                "venue_text": getattr(e, "venue_text", v.venue_name if v else ""),
+                "image": e.event_image if e else None
+            }
+        })
+
+    return render_template(
+        'booking.html',
+        title="Booking History",
+        bookings=bookings
+    )
+
+
+# =========================
+# CREATE A BOOKING (requires login)
+# called via POST (e.g. "Book Now" button on event page)
+# =========================
+@main_bp.route('/book', methods=['POST'], endpoint='create_booking')
+@login_required
+def create_booking():
+    form = BookingForm()
+    if not form.validate_on_submit():
+        flash("Invalid booking submission.", "danger")
+        return redirect(url_for('main.index'))
+
+    event_id = int(form.event_id.data)
+    qty = int(form.quantity.data)
+
+    event = Event.query.get(event_id)
+    if not event:
+        flash("Event not found.", "warning")
+        return redirect(url_for('main.index'))
+
+    booking = Booking(
+        user_id=current_user.id,
+        event_id=event.id,
+        booking_quantity=qty
+    )
+    db.session.add(booking)
+    db.session.commit()
+
+    flash("Your booking was created!", "success")
+    return redirect(url_for('main.booking'))
 
 # ---------- helper: save upload to static/img and return filename ----------
 def _save_upload(form):

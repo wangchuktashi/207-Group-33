@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms.fields import TextAreaField, IntegerField,  SubmitField, StringField, PasswordField, SelectField, DateTimeLocalField
+from wtforms.fields import TextAreaField, IntegerField,HiddenField,  SubmitField, StringField, PasswordField, SelectField, DateTimeLocalField
 from wtforms.validators import InputRequired, Length, Email, EqualTo, AnyOf, NumberRange
 from flask_wtf.file import FileRequired, FileField, FileAllowed
 from datetime import datetime
@@ -71,6 +71,18 @@ class EventForm(FlaskForm):
     submit = SubmitField("Create Event")
     reset = SubmitField("Reset")
 
+class BookingForm(FlaskForm):
+    event_id = HiddenField(validators=[InputRequired()])
+    ticket_type = SelectField(
+        "Ticket type",
+        choices=[("General", "General"), ("Student", "Student"), ("VIP", "VIP")],
+        validators=[InputRequired()]
+    )
+    quantity = IntegerField(
+        "Quantity",
+        validators=[InputRequired(), NumberRange(min=1, max=10, message="1–10 only")]
+    )
+    submit = SubmitField("Book Now")
 
 # user comment form
 class CommentForm(FlaskForm):
