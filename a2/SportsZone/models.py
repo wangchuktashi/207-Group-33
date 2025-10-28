@@ -5,20 +5,16 @@ from . import db
 # -------------------- Users --------------------
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
-
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(100), nullable=False)
-    surname = db.Column(db.String(100), nullable=False)
-    email_id = db.Column(db.String(100), unique=True, index=True, nullable=False)
+    name = db.Column(db.String(100), index=True, unique=True, nullable=False)
+    # allow formats like "0423 456 132" -> make longer than 10
+    mobile_number = db.Column(db.String(20), unique=True, nullable=False)
+    email_id = db.Column(db.String(100), index=True, unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    mobile_number = db.Column(db.String(15), unique=True, nullable=False)
-    street_address = db.Column(db.String(255), nullable=False)
-
-    comments = db.relationship('Comment', backref='user')
+    comments = db.relationship('Comment', backref='user', lazy=True)
 
     def __repr__(self):
-        return f"{self.first_name} {self.surname}"
-
+        return f"<User {self.name}>"
 
 # -------------------- Venues --------------------
 class Venue(db.Model):
@@ -37,13 +33,11 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'))
-    # not unique: you want many Football events
     sports_type = db.Column(db.String(64), index=True)
     event_title = db.Column(db.String(256))
     home_team_name = db.Column(db.String(64))
     away_team_name = db.Column(db.String(64))
     event_image = db.Column(db.String(256))
-    # use callables so the time is set when rows are created
     start_datetime = db.Column(db.DateTime, default=datetime.utcnow)
     end_datetime = db.Column(db.DateTime, default=datetime.utcnow)
 
