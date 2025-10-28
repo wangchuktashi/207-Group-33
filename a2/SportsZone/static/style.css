@@ -10,7 +10,7 @@ body { background-color:#a7f3d0; }
 .sportszone-nav .nav-link.active{ color:#d58311c0; }
 .sportszone-nav .navbar-brand{ color:#0e0e0f; }
 
-/* Cards (generic) */
+/* Cards  */
 .card{
   border:0;
   border-radius:16px;
@@ -19,7 +19,7 @@ body { background-color:#a7f3d0; }
 }
 .card:hover { border: 2px solid #134e4a; }
 
-/* Card media helper */
+
 .card-media{ aspect-ratio:16/9; background:#fff; }
 .card-media > img{
   width:100%;
@@ -29,7 +29,7 @@ body { background-color:#a7f3d0; }
   padding:6px;
 }
 
-/* Toolbar (categories, search, status) */
+/* Toolbar  */
 .toolbar{
   background:#ffffff;
   display:flex;
@@ -54,7 +54,7 @@ body { background-color:#a7f3d0; }
 /* Search box */
 .search-box{ border-radius:20px 0 0 20px; }
 
-/* Responsive tweaks shared */
+
 @media (max-width:576px){
   .toolbar{ flex-direction:column; align-items:stretch; }
   .toolbar form{ width:100%; margin-left:0 !important; }
