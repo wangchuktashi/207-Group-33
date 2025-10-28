@@ -3,68 +3,85 @@
 
 {% block extra_css %}
 <style>
-  .booking-card{border:1px solid rgba(72,72,72,.06);border-radius:14px;overflow:hidden;background:#bff1ec;transition:transform .15s, box-shadow .15s;}
-  .booking-card:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,.12);}
-  .booking-row{min-height:200px;align-items:stretch;}
-  .booking-thumb{width:100%;height:100%;object-fit:cover;display:block;}
-  .booking-body{padding:1.25rem 1.25rem 1rem;display:flex;flex-direction:column;height:100%;}
-  .booking-meta{margin-top:.25rem;}
-  .booking-actions{margin-top:auto;}
-  .booking-title{margin-bottom:.25rem;line-height:1.3;}
-  .booking-badge{align-self:flex-start;margin-left:.75rem;}
-  @media (max-width:576px){.booking-row{min-height:auto;}.booking-body{padding:1rem;}}
+  .booking-card {
+    border: 1px solid rgba(0,0,0,.1);
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    transition: transform .2s, box-shadow .2s;
+    height: 100%;
+  }
+  .booking-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.1);
+  }
+  .booking-thumb {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: #f2f2f2;
+  }
+  .meta small {
+    display: block;
+    color: #6c757d;
+  }
 </style>
 {% endblock %}
 
 {% block body %}
-<header class="mb-3">
-  <h1 class="h3 mb-1">Your Bookings</h1>
-</header>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">Your Bookings</h1>
+    <a class="btn btn-outline-secondary" href="{{ url_for('main.index') }}">Browse Events</a>
+  </div>
 
-{% if orders and orders|length > 0 %}
-  <div class="row g-3">
-    {% set color_map = {'Football':'primary','Basketball':'warning','Cricket':'success','Tennis':'secondary'} %}
-    {% for o in orders %}
-      <div class="col-12">
-        <div class="card booking-card shadow-sm">
-          <div class="row g-0 booking-row">
-            <!-- image -->
-            <div class="col-12 col-md-3 booking-thumb-wrap">
-              <img src="{{ url_for('static', filename='img/' ~ o.image) }}" class="booking-thumb" alt="{{ o.event_title }}">
+  {% if bookings and bookings|length %}
+    <div class="row g-4">
+      {% for b in bookings %}
+      <div class="col-12 col-md-6 col-lg-4 d-flex">
+        <div class="booking-card flex-fill d-flex flex-column">
+          {% if b.event.image %}
+          <img class="booking-thumb" src="{{ url_for('static', filename='img/' ~ b.event.image) }}" alt="Event image">
+          {% else %}
+          <div class="booking-thumb d-flex align-items-center justify-content-center text-muted">No Image</div>
+          {% endif %}
+
+          <div class="p-3 d-flex flex-column flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h2 class="h5 mb-0">{{ b.event.title }}</h2>
+              <span class="badge bg-primary">Qty {{ b.qty }}</span>
             </div>
 
-            <!-- content -->
-            <div class="col-12 col-md-9">
-              <div class="booking-body">
-                <div class="d-flex flex-wrap align-items-start">
-                  <h5 class="booking-title mb-0">{{ o.event_title }}</h5>
-                  <span class="badge text-bg-{{ color_map[o.sport] if o.sport in color_map else 'secondary' }} booking-badge">{{ o.sport }}</span>
-                </div>
-
-                <div class="booking-meta">
-                  <p class="small text-muted mb-1">Booked on: <b>{{ o.booked_at }}</b></p>
-                  <p class="small mb-2">
-                    Order ID: <span class="fw-semibold">{{ o.order_code }}</span>
-                    {% if o.quantity %} · Qty: <span class="fw-semibold">{{ o.quantity }}</span>{% endif %}
-                  </p>
-                </div>
-
-                <div class="booking-actions">
-                  <a href="{{ url_for('main.view_event', event_id=o.event_id) }}" class="btn btn-sm btn-primary">View Event</a>
-                </div>
-              </div>
+            <div class="meta mb-2">
+              <small><b>Order ID:</b> BK-{{ b.id }}</small>
+              <small><b>Booked:</b> {{ b.date }}</small>
+              <small><b>When:</b> {{ b.event.start_text }}{% if b.event.end_text %} – {{ b.event.end_text }}{% endif %}</small>
+              <small><b>Where:</b> {{ b.event.venue_text }}</small>
             </div>
 
+            <div class="mt-auto pt-2 d-flex flex-wrap gap-2">
+              {% if b.event.id %}
+              <a href="{{ url_for('main.event_detail', event_id=b.event.id) }}" class="btn btn-sm btn-outline-primary flex-fill">View</a>
+              {% endif %}
+              <form method="post" action="{{ url_for('main.create_booking') }}" class="flex-fill">
+                <input type="hidden" name="event_id" value="{{ b.event.id }}">
+                <input type="hidden" name="quantity" value="{{ b.qty }}">
+                <button type="submit" class="btn btn-sm btn-primary w-100">Book Again</button>
+              </form>
+              <form method="post" action="{{ url_for('main.delete_booking', booking_id=b.id) }}" class="flex-fill" onsubmit="return confirm('Delete this booking?');">
+                <button type="submit" class="btn btn-sm btn-danger w-100">Delete</button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-    {% endfor %}
-  </div>
-{% else %}
-  <div class="alert alert-info">
-    You haven’t booked any events yet.
-    <a href="{{ url_for('main.index') }}" class="alert-link">Browse events</a>
-  </div>
-{% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      You haven’t booked any events yet.
+      <a href="{{ url_for('main.index') }}" class="alert-link">Browse events</a>
+    </div>
+  {% endif %}
+</div>
 {% endblock %}
-
