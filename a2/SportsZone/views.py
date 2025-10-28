@@ -1,20 +1,16 @@
-# website/views.py
-import os
 from datetime import datetime
-from flask import Blueprint, render_template, request, redirect, url_for
-from flask_login import login_required
-from werkzeug.utils import secure_filename
-
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+#Login + password utilities
+from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
-from .models import Event, EventStatus, Venue, Comment  # (Comment is here if you add posting later)
-from .forms import EventForm, CommentForm                # EventForm is used below
+from .models import Event, EventStatus, Venue, Comment, Booking, User  # [A2-ADD] added Booking & User
+
 
 mainbp = Blueprint('main', __name__)
 
-# ---------- Home (public) ----------
 @mainbp.route('/', endpoint='index')
 def index():
-    # optional filters used by your toolbar
     cat = (request.args.get('category') or 'all').lower()
     st  = (request.args.get('status') or 'all').lower()
     q   = (request.args.get('q') or '').strip().lower()
@@ -25,7 +21,6 @@ def index():
 
     events = query.order_by(Event.start_datetime.asc()).all()
 
-    # Apply status + search filters using the properties
     def ok(e: Event) -> bool:
         if st != 'all' and e.status.lower() != st:
             return False
@@ -38,86 +33,145 @@ def index():
     events = [e for e in events if ok(e)]
     return render_template('index.html', title="SportsZone | Home", events=events)
 
-# ---------- View a single event (public) ----------
 @mainbp.route('/event/<int:event_id>', endpoint='view_event')
 def view_event(event_id):
     e = Event.query.get_or_404(event_id)
     return render_template('event.html', title=e.title, event=e)
 
-# ---------- Create event via WTForms + upload (login required) ----------
 @mainbp.route('/create-event', methods=['GET', 'POST'], endpoint='create_event')
-@login_required
 def create_event():
-    form = EventForm()
+    if request.method == 'POST':
+        f = request.form
 
-    # If user clicked reset, just reload the form
-    if form.reset.data:
-        return redirect(url_for('main.create_event'))
+        # upsert venue quickly
+        vname = (f.get('venue') or '').strip()
+        venue = Venue.query.filter_by(venue_name=vname).first()
+        if not venue:
+            venue = Venue(venue_name=vname, capacity=int(f.get('tickets') or 0))
+            db.session.add(venue)
+            db.session.flush()
 
-    if form.validate_on_submit() and form.submit.data:
-        # save upload (returns filename or None)
-        filename = _save_upload(form)
+        def parse_dt(val):
+            try:    return datetime.strptime(val, "%Y-%m-%dT%H:%M")
+            except: return None
 
-        # ensure venue exists (model stores venue_id)
-        venue_name = (form.venue.data or "").strip()
-        venue = None
-        if venue_name:
-            venue = Venue.query.filter_by(venue_name=venue_name).first()
-            if not venue:
-                venue = Venue(venue_name=venue_name)
-                db.session.add(venue)
-                db.session.flush()  # get id
-
-        # map form fields to Event model columns
-        event = Event(
-            sports_type      = form.sport_type.data,
-            event_title      = form.event_title.data,
-            home_team_name   = form.home_team.data,
-            away_team_name   = form.away_team.data,
-            start_datetime   = form.start_datetime.data,
-            end_datetime     = form.end_datetime.data,
-            event_image      = filename or ""
+        e = Event(
+            venue_id=venue.id if venue else None,
+            sports_type=f.get('sport'),
+            event_title=f.get('title'),
+            home_team_name=f.get('home'),
+            away_team_name=f.get('away'),
+            event_image=f.get('image') or "",
+            start_datetime=parse_dt(f.get('start')),
+            end_datetime=parse_dt(f.get('end')),
         )
-        if venue:
-            event.venue = venue  # sets venue_id via relationship
-
-        db.session.add(event)
+        db.session.add(e)
         db.session.flush()
-        db.session.add(EventStatus(event_id=event.id, event_status="Open"))
+        db.session.add(EventStatus(event_id=e.id, event_status="Open"))
         db.session.commit()
 
-        # After a successful create, you can redirect back to the form or to the new event
-        return redirect(url_for('main.view_event', event_id=event.id))
+        flash('Event saved.', 'success')
+        return redirect(url_for('main.view_event', event_id=e.id))
 
-    return render_template('create_event.html', form=form, title="Create Event")
+    return render_template('create_event.html', title="Create Event")
 
-# ---------- Booking page (leave as-is) ----------
-@mainbp.route('/booking', endpoint='booking')
-@login_required
+
+@mainbp.route('/event/<int:event_id>', endpoint='event_detail')
+def event_detail(event_id):
+    event = Event.query.get_or_404(event_id)
+    return render_template('event.html', event=event, title=event.event_title or event.home_team_name)
+
+# ----------------------------------------------------------
+# BOOKING HISTORY (Temporarily no login required for testing)
+# ----------------------------------------------------------
+@mainbp.route('/booking', methods=['GET'], endpoint='booking')
+# @login_required  # Disabled login requirement to test booking history without logging in
 def booking():
-    return render_template('booking.html', title="Booking History")
+    # [A2-ADD] Fetch bookings for the current user
+    rows = (db.session.query(Booking, Event, Venue)
+            # Commented filter below if you want to see ALL bookings
+            # .filter(Booking.user_id == current_user.id)
+            .join(Event, Booking.event_id == Event.id, isouter=True)
+            .join(Venue, Event.venue_id == Venue.id, isouter=True)
+            .order_by(Booking.booking_date.desc())
+            .all())
+    bookings = []
+    for b, e, v in rows:
+        bookings.append({
+            "id": b.id,
+            "date": b.booking_date.strftime("%d %b %Y, %I:%M %p") if b.booking_date else "",
+            "qty": b.booking_quantity or 1,
+            "event": {
+                "id": e.id if e else None,
+                "title": (e.event_title or f"{e.home_team_name} vs {e.away_team_name}") if e else "Unknown Event",
+                "start_text": e.start_text if e else "",
+                "end_text": e.end_text if e else "",
+                "venue_text": e.venue_text if e else (v.venue_name if v else ""),
+                "image": e.event_image if e else None
+            }
+        })
+    return render_template('booking.html', title="Booking History", bookings=bookings)
 
-# ---------- helper: save upload to static/img and return filename ----------
-def _save_upload(form):
-    file_field = getattr(form, 'image', None)
-    if not file_field or not file_field.data:
-        return None
 
-    fp = file_field.data
-    filename = secure_filename(getattr(fp, 'filename', '') or '')
-    if not filename:
-        return None
+# ---------------------------------
+# LOGIN / LOGOUT (kept unchanged)
+# ---------------------------------
+@mainbp.route('/login', methods=['GET','POST'], endpoint='login')
+def login():
+    from .forms import LoginForm
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(name=form.user_name.data).first()
+        if user and check_password_hash(user.password_hash, form.password.data):
+            login_user(user)
+            flash("Logged in successfully.", "success")
+            next_url = request.args.get('next') or url_for('main.index')
+            return redirect(next_url)
+        flash("Invalid username or password.", "danger")
+    return render_template('login.html', form=form, title="Login")
 
-    # Save into your app's static/img directory
-    from flask import current_app
-    upload_dir = os.path.join(current_app.root_path, 'static', 'img')
-    os.makedirs(upload_dir, exist_ok=True)
+@mainbp.route('/register', endpoint='register')
+def register():
+    return "<h1>Register - coming soon</h1>"
 
-    try:
-        fp.save(os.path.join(upload_dir, filename))
-    except Exception:
-        # Keep it simple per your request: on error, just skip storing a file
-        return None
+@mainbp.route('/logout', endpoint='logout')
+@login_required 
+def logout():
+    logout_user()
+    flash("You have been logged out.", "info")
+    return redirect(url_for('main.index'))
 
-    # store only the filename in DB
-    return filename
+
+# --------------------------------------------------
+#  no login for testing
+# --------------------------------------------------
+@mainbp.route('/book', methods=['POST'], endpoint='create_booking')
+# @login_required  # Disabled login for testing
+def create_booking():
+    event_id = request.form.get('event_id', type=int)
+    qty = request.form.get('quantity', default=1, type=int)
+    if not event_id:
+        flash("Missing event.", "danger")
+        return redirect(url_for('main.index'))
+    event = Event.query.get(event_id)
+    if not event:
+        flash("Event not found.", "warning")
+        return redirect(url_for('main.index'))
+    qty = max(1, min(qty, 10))  # clamp
+    booking = Booking(event_id=event.id, booking_quantity=qty)
+    db.session.add(booking)
+    db.session.commit()
+    flash("Your booking was created!", "success")
+    return redirect(url_for('main.booking'))
+# --------------------------------------------------
+# no login for testing
+# --------------------------------------------------
+@mainbp.route('/delete-booking/<int:booking_id>', methods=['POST'], endpoint='delete_booking')
+# @login_required  #  Disabled login requirement for testing
+def delete_booking(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    db.session.delete(booking)
+    db.session.commit()
+    flash(f"Booking ID BK-{booking_id} deleted successfully.", "info")
+    return redirect(url_for('main.booking'))
+
