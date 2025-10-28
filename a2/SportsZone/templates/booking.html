@@ -49,7 +49,7 @@
           <div class="p-3 d-flex flex-column flex-grow-1">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <h2 class="h5 mb-0">{{ b.event.title }}</h2>
-              <span class="badge bg-primary">Qty {{ b.quantity }}</span>
+              <span class="badge bg-primary">Qty {{ b.qty }}</span>
             </div>
 
             <div class="meta mb-2">
@@ -65,7 +65,7 @@
               {% endif %}
               <form method="post" action="{{ url_for('main.create_booking') }}" class="flex-fill">
                 <input type="hidden" name="event_id" value="{{ b.event.id }}">
-                <input type="hidden" name="quantity" value="{{ b.quantity }}">
+                <input type="hidden" name="quantity" value="{{ b.qty }}">
                 <button type="submit" class="btn btn-sm btn-primary w-100">Book Again</button>
               </form>
               <form method="post" action="{{ url_for('main.delete_booking', booking_id=b.id) }}" class="flex-fill" onsubmit="return confirm('Delete this booking?');">
