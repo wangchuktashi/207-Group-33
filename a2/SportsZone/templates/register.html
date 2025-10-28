@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Register · SportsZone{% endblock %}
+{% block body %}
+<div class="container py-4">
+  <h1 class="h3">Register</h1>
+  <form method="post" class="card p-3" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      {{ form.user_name.label(class="form-label") }}
+      {{ form.user_name(class="form-control") }}
+      {% for e in form.user_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="mb-3">
+      {{ form.email.label(class="form-label") }}
+      {{ form.email(class="form-control") }}
+      {% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="mb-3">
+      {{ form.password.label(class="form-label") }}
+      {{ form.password(class="form-control") }}
+      {% for e in form.password.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="mb-3">
+      {{ form.confirm.label(class="form-label") }}
+      {{ form.confirm(class="form-control") }}
+      {% for e in form.confirm.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+  </form>
+</div>
+{% endblock %}
