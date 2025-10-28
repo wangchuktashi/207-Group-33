@@ -123,8 +123,11 @@
         <button class="btn btn-primary w-100 mb-2"
                 data-bs-toggle="modal" data-bs-target="#confirmModal"
                 {% if not can_book %}disabled aria-disabled="true"{% endif %}>
-          Book Now
-        </button>
+          <form method="post" action="{{ url_for('main.create_booking') }}" class="d-inline">
+  <input type="hidden" name="event_id" value="{{ event.id }}">
+  <input type="hidden" name="quantity" value="1">
+  <button type="submit" class="btn btn-lg btn-primary w-100">Book Now</button>
+</form>
       </div>
     </div>
   </aside>
