@@ -1,10 +1,10 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-#Login + password utilities
+#Login + password 
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
-from .models import Event, EventStatus, Venue, Comment, Booking, User  # [A2-ADD] added Booking & User
+from .models import Event, EventStatus, Venue, Comment, Booking, User  
 
 
 mainbp = Blueprint('main', __name__)
@@ -87,7 +87,6 @@ def event_detail(event_id):
 @mainbp.route('/booking', methods=['GET'], endpoint='booking')
 # @login_required  # Disabled login requirement to test booking history without logging in
 def booking():
-    # [A2-ADD] Fetch bookings for the current user
     rows = (db.session.query(Booking, Event, Venue)
             # Commented filter below if you want to see ALL bookings
             # .filter(Booking.user_id == current_user.id)
@@ -157,7 +156,7 @@ def create_booking():
     if not event:
         flash("Event not found.", "warning")
         return redirect(url_for('main.index'))
-    qty = max(1, min(qty, 10))  # clamp
+    qty = max(1, min(qty, 100)) 
     booking = Booking(event_id=event.id, booking_quantity=qty)
     db.session.add(booking)
     db.session.commit()
