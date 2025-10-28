@@ -99,42 +99,35 @@ def create_event():
 @main_bp.route('/booking', methods=['GET'], endpoint='booking')
 @login_required
 def booking():
-    # join Bookings -> Event -> Venue so we can display some details
     rows = (
         db.session.query(Booking, Event, Venue)
-        .filter(Booking.user_id == current_user.id)
+        .filter(Booking.user_id == current_user.id)  # show only my bookings now
         .join(Event, Booking.event_id == Event.id, isouter=True)
         .join(Venue, Event.venue_id == Venue.id, isouter=True)
         .order_by(Booking.booking_date.desc())
         .all()
     )
 
-    bookings = []
+    orders = []
     for b, e, v in rows:
-        bookings.append({
-            "id": b.id,
-            "date": (
-                b.booking_date.strftime("%d %b %Y, %I:%M %p")
-                if b.booking_date else ""
+        orders.append({
+            "order_code": f"BK-{b.id}",
+            "booked_at": b.booking_date.strftime("%d %b %Y, %I:%M %p") if b.booking_date else "",
+            "quantity": b.booking_quantity or 1,
+            "event_id": e.id if e else None,
+            "event_title": (
+                e.event_title
+                or f"{e.home_team_name} vs {e.away_team_name}"
+                if e else "Unknown Event"
             ),
-            "qty": b.booking_quantity or 1,
-            "event": {
-                "id": e.id if e else None,
-                "title": (
-                    e.event_title
-                    or f"{e.home_team_name} vs {e.away_team_name}"
-                ) if e else "Unknown Event",
-                "start_text": getattr(e, "start_text", ""),   # safe fallback
-                "end_text": getattr(e, "end_text", ""),
-                "venue_text": getattr(e, "venue_text", v.venue_name if v else ""),
-                "image": e.event_image if e else None
-            }
+            "image": e.event_image if e else None,
+            "sport": e.sports_type if e else "",
         })
 
     return render_template(
         'booking.html',
         title="Booking History",
-        bookings=bookings
+        orders=orders
     )
 
 
@@ -145,18 +138,20 @@ def booking():
 @main_bp.route('/book', methods=['POST'], endpoint='create_booking')
 @login_required
 def create_booking():
-    form = BookingForm()
-    if not form.validate_on_submit():
-        flash("Invalid booking submission.", "danger")
-        return redirect(url_for('main.index'))
+    event_id = request.form.get('event_id', type=int)
+    qty = request.form.get('quantity', default=1, type=int)
 
-    event_id = int(form.event_id.data)
-    qty = int(form.quantity.data)
+    if not event_id:
+        flash("Missing event.", "danger")
+        return redirect(url_for('main.index'))
 
     event = Event.query.get(event_id)
     if not event:
         flash("Event not found.", "warning")
         return redirect(url_for('main.index'))
+
+    # clamp quantity
+    qty = max(1, min(qty, 100))
 
     booking = Booking(
         user_id=current_user.id,
@@ -167,6 +162,17 @@ def create_booking():
     db.session.commit()
 
     flash("Your booking was created!", "success")
+    return redirect(url_for('main.booking'))
+# --------------------------------------------------
+# no login for testing
+# --------------------------------------------------
+@main_bp.route('/delete-booking/<int:booking_id>', methods=['POST'], endpoint='delete_booking')
+# @login_required  #  Disabled login requirement for testing
+def delete_booking(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    db.session.delete(booking)
+    db.session.commit()
+    flash(f"Booking ID BK-{booking_id} deleted successfully.", "info")
     return redirect(url_for('main.booking'))
 
 # ---------- helper: save upload to static/img and return filename ----------

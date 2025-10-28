@@ -131,14 +131,10 @@ class Comment(db.Model):
 class Booking(db.Model):
     __tablename__ = "bookings"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
-    booking_quantity = db.Column(db.Integer, default=1)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     booking_date = db.Column(db.DateTime, default=datetime.utcnow)
-
-    user = db.relationship('User', backref='bookings')
-    event = db.relationship('Event', backref='bookings')
-
+    booking_quantity = db.Column(db.Integer)
     def __repr__(self):
         return f"<Booking {self.id}>"
 
