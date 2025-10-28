@@ -119,7 +119,7 @@
           </select>
 
           <label class="form-label">Quantity</label>
-          <input type="number" name="quantity" class="form-control form-control-sm mb-3" min="1" max="10" value="1" {% if not can_book %}disabled{% endif %}>
+          <input type="number" name="quantity" class="form-control form-control-sm mb-3" min="1" max="100" value="1" {% if not can_book %}disabled{% endif %}>
 
           <button type="submit" class="btn btn-lg btn-primary w-100" {% if not can_book %}disabled aria-disabled="true"{% endif %}>
             Book Now
