@@ -10,23 +10,66 @@ body { background-color:#a7f3d0; }
 .sportszone-nav .nav-link.active{ color:#d58311c0; }
 .sportszone-nav .navbar-brand{ color:#0e0e0f; }
 
-/* Cards (generic) */
-.card{
-  border:0;
-  border-radius:16px;
-  overflow:hidden;
-  box-shadow:0 10px 24px rgba(0,0,0,.08);
-}
-.card:hover { border: 2px solid #134e4a; }
+/* === Event card container === */
+.card {
+  border: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+  background: #fff;
 
-/* Card media helper */
-.card-media{ aspect-ratio:16/9; background:#fff; }
-.card-media > img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  display:block;
-  padding:6px;
+  /* make all cards consistent height */
+  display: flex;
+  flex-direction: column;
+  height: 540px;              /* <- tune this number if needed */
+  max-width: 400px;           /* optional: keeps nice column width */
+}
+
+/* nice hover accent without layout shift */
+.card:hover {
+  border: 2px solid #134e4a;
+  box-shadow: 0 16px 32px rgba(0,0,0,.18);
+  transform: translateY(-4px);
+  transition: all .2s ease;
+}
+
+/* === Card media (poster image) === */
+.card-media {
+  /* instead of aspect-ratio, lock a fixed pixel height so
+     every poster is the same size no matter the source image */
+  height: 320px;
+  width: 100%;
+  background:#000;
+  overflow:hidden;
+  flex-shrink: 0;
+}
+
+/* poster image itself */
+.card-media > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* fill box, crop edges if needed */
+  object-position: center;
+  display: block;
+  padding: 0;                 /* remove padding so edges are flush */
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+/* === Card body content under the image === */
+.card-body {
+  /* make the bottom button line up across cards */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1rem 1rem 1rem;
+}
+
+/* force the "View Details" button to sit at the bottom */
+.card-body .btn {
+  margin-top: auto;
+  font-weight: 500;
+  border-radius: 8px;
 }
 
 /* Toolbar (categories, search, status) */
