@@ -176,6 +176,46 @@ def delete_booking(booking_id):
     return redirect(url_for('main.booking'))
 
 # =========================
+# EVENT DETAILS
+# =========================
+@app.route('/event/<int:event_id>', methods=['GET', 'POST'])
+def event_details(event_id):
+    event = Event.query.get_or_404(event_id)
+    form = CommentForm()
+    booking = BookingForm()
+
+    if booking.validate_on_submit():
+        if not current_user.is_authenticated:
+            flash("Please log in to book tickets.", "warning")
+            return redirect(url_for('login'))
+
+        qty = booking.quantity.data
+        if qty > event.tickets:
+            flash("Not enough tickets available.", "danger")
+        else:
+            event.tickets -= qty
+            new_booking = Booking(user_id=current_user.id, event_id=event.id, quantity=qty)
+            db.session.add(new_booking)
+            db.session.commit()
+            flash("Booking successful!", "success")
+            return redirect(url_for('event_details', event_id=event.id))
+
+    # Redirect to login if not authenticated before commenting
+    if form.validate_on_submit():
+        if not current_user.is_authenticated:
+            flash("Please log in to post a comment.", "warning")
+            return redirect(url_for('login'))
+
+        comment = Comment(text=form.text.data, user_id=current_user.id, event_id=event.id)
+        db.session.add(comment)
+        db.session.commit()
+        flash("Comment added successfully!", "success")
+        return redirect(url_for('event_details', event_id=event.id))
+
+    comments = Comment.query.filter_by(event_id=event.id).order_by(Comment.created_at.desc()).all()
+    return render_template('event.html', event=event, form=form, comments=comments, booking=booking)
+
+# =========================
 # UPDATE EVENT (requires login)
 # =========================
 @main_bp.route('/update-event/<int:event_id>', methods=['GET', 'POST'], endpoint='update_event')
@@ -230,3 +270,4 @@ def _save_upload(form):
 
     # store only the filename in DB
     return filename
+
