@@ -135,7 +135,6 @@ class Booking(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'))
     booking_date = db.Column(db.DateTime, default=datetime.utcnow)
     booking_quantity = db.Column(db.Integer)
-
     def __repr__(self):
         return f"<Booking {self.id}>"
 
