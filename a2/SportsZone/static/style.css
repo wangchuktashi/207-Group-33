@@ -1,14 +1,22 @@
 /* === Global / Shared Styles === */
 
-/* Body */
-body { background-color:#a7f3d0; }
+.navbar {
+  background-color: #004643;
+}
+body {
+  background-color: #E8F3F1;
+  color: #0F2F28;
+}
+.btn-primary {
+  background-color: #00A896;
+  border-color: #00A896;
+}
+.btn-primary:hover {
+  background-color: #02C39A;
+  border-color: #02C39A;
+}
 
-/* Navbar */
-.sportszone-nav{ background:#134e4a; }
-.sportszone-nav .nav-link{ color:#000; }
-.sportszone-nav .nav-link:hover,
-.sportszone-nav .nav-link.active{ color:#d58311c0; }
-.sportszone-nav .navbar-brand{ color:#0e0e0f; }
+
 
 /* === Event card container === */
 .card {
