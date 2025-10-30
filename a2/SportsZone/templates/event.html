@@ -3,21 +3,65 @@
 
 {% block extra_css %}
 <style>
+  /* --- Hero --- */
   .event-hero{position:relative;width:100%;max-height:500px;overflow:hidden;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);margin-top:10px;}
-  .hero-banner{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.85);transition:transform .5s ease;}
+  .hero-banner{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.88);transition:transform .5s ease;}
   .event-hero:hover .hero-banner{transform:scale(1.05);}
   .hero-overlay{position:absolute;bottom:20px;left:20px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.7);}
-  .hero-title{font-size:2rem;font-weight:700;}
-  .hero-subtitle{font-size:1rem;margin-top:.25rem;}
+  .hero-title{font-size:2rem;font-weight:700;margin:0;}
+  .hero-subtitle{font-size:1rem;margin-top:.25rem;margin-bottom:0;}
+
+  /* --- Section polish --- */
+  .section-title{
+    display:flex;align-items:center;gap:.75rem;margin:1.5rem 0 .75rem;
+    font-weight:700;color:#0f2f28;
+  }
+  .section-title::after{content:"";height:1px;flex:1;background:rgba(0,0,0,.08);}
+
+  /* About list */
+  .info-list{margin:0;padding:0}
+  .info-list dt{
+    width:130px;float:left;clear:left;font-weight:600;color:#0f2f28;padding:.45rem 0;
+  }
+  .info-list dd{margin-left:140px;padding:.45rem 0;color:#111827;}
+
+  /* Comments */
+  .empty-state{
+    background:#fff;border:1px dashed #cceee0;color:#0f2f28;padding:.85rem 1rem;border-radius:10px;
+  }
+  .comment-card{
+    background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:1rem;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+  }
+
+  /* Booking panel */
   @media (min-width:992px){ .sticky-side{position:sticky;top:1rem;} }
+  .booking-card{
+    background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;
+    box-shadow:0 16px 32px rgba(0,0,0,.12);padding:1.25rem;
+  }
+  .booking-card h3{font-size:1.05rem;font-weight:700;margin:0 0 .75rem;}
+  .booking-meta{font-size:.92rem;color:#6b7280;margin-bottom:.75rem;}
+  .booking-card .form-label{font-weight:600;color:#0f2f28;}
+  .booking-card .btn-primary{padding:.65rem 1rem;font-weight:600;border-radius:10px;}
+
+  /* Inputs focus */
+  .form-control:focus,.form-select:focus{box-shadow:0 0 0 .2rem rgba(13,110,253,.15);}
+
+  @media (max-width: 991px){
+    .info-list dt{width:110px}
+    .info-list dd{margin-left:120px}
+  }
 </style>
 {% endblock %}
 
 {% block body %}
 <!-- Hero banner -->
 <div class="event-hero mb-3">
-  <img src="{{ url_for('static', filename='img/' ~ event.hero_image) }}"
-       alt="{{ event.title }}" class="img-fluid hero-banner">
+  <img
+    src="{{ url_for('static', filename='img/' ~ (event.hero_image or event.image or 'placeholder.jpg')) }}"
+    alt="{{ event.title }}"
+    class="img-fluid hero-banner">
   <div class="hero-overlay">
     <h1 class="hero-title">{{ event.title }}</h1>
     <p class="hero-subtitle">{{ event.venue_text }}</p>
@@ -28,19 +72,14 @@
 {% set teams = event.title.split(' vs ') %}
 {% if teams|length == 2 %}
 <div class="d-flex justify-content-center align-items-center gap-4 mb-2">
-  <div class="text-center">
-    <div class="small fw-bold">{{ teams[0] }}</div>
-  </div>
+  <div class="text-center"><div class="small fw-bold">{{ teams[0] }}</div></div>
   <div class="h4 mb-0">vs</div>
-  <div class="text-center">
-    <div class="small fw-bold">{{ teams[1] }}</div>
-  </div>
+  <div class="text-center"><div class="small fw-bold">{{ teams[1] }}</div></div>
 </div>
 {% endif %}
 
-<!-- Title, badges -->
+<!-- Badges + meta -->
 <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
-  <h1 class="h3 mb-0">{{ event.title }}</h1>
   <span class="badge text-bg-primary">{{ event.sport }}</span>
   <span class="badge text-bg-{{ event.badge }} badge-status">{{ event.status }}</span>
 </div>
@@ -49,92 +88,100 @@
 </p>
 
 <div class="row g-4">
-  <!-- details, description -->
+  <!-- LEFT: About + Comments -->
   <div class="col-lg-8">
-    <section class="mt-1 about-event">
-      <h2 class="h5 mb-3 text-primary fw-bold">About this event</h2>
-      <p class="lead">{{ event.description }}</p>
+    <!-- About -->
+    <h2 class="section-title">About this event</h2>
 
-      <dl class="row small event-details mt-3">
-        <dt class="col-sm-3 fw-bold">Venue</dt><dd class="col-sm-9">{{ event.venue_text }}</dd>
-        <dt class="col-sm-3 fw-bold">Start</dt><dd class="col-sm-9">{{ event.start_text }}</dd>
-        {% if event.end_text %}
-        <dt class="col-sm-3 fw-bold">End</dt><dd class="col-sm-9">{{ event.end_text }}</dd>
-        {% endif %}
-        {% if teams|length == 2 %}
-        <dt class="col-sm-3 fw-bold">Home / Away</dt><dd class="col-sm-9">{{ teams[0] }} vs {{ teams[1] }}</dd>
-        {% endif %}
-      </dl>
-    </section>
+    {% if event.description %}
+      <p class="lead">{{ event.description }}</p>
+    {% endif %}
+
+    <dl class="info-list clearfix">
+      <dt>Venue</dt>
+      <dd>{{ event.venue_text }}</dd>
+
+      <dt>Start</dt>
+      <dd>{{ event.start_text }}</dd>
+
+      {% if event.end_text %}
+      <dt>End</dt>
+      <dd>{{ event.end_text }}</dd>
+      {% endif %}
+
+      {% if teams|length == 2 %}
+      <dt>Home / Away</dt>
+      <dd>{{ teams[0] }} vs {{ teams[1] }}</dd>
+      {% endif %}
+    </dl>
 
     <!-- Comments -->
-    <section class="mt-4">
-      <h2 class="h5 mb-3">Comments</h2>
+    <h2 class="section-title mt-4">Comments</h2>
+
+    {% if event.comments and event.comments|length > 0 %}
       <ul class="list-group mb-3">
         {% for c in event.comments %}
-          <li class="list-group-item">
-            <b>{{ c.user.name if c.user else 'Anon' }}</b>
-            <span class="text-muted small">· {{ c.created_at }}</span>
-            <p class="mb-0">{{ c.text }}</p>
+          <li class="list-group-item d-flex flex-column">
+            <div class="small text-muted">
+              <strong>{{ c.user.name if c.user else 'Anon' }}</strong> · {{ c.created_at }}
+            </div>
+            <div>{{ c.text }}</div>
           </li>
-        {% else %}
-          <li class="list-group-item text-muted">No comments yet</li>
         {% endfor %}
       </ul>
+    {% else %}
+      <div class="empty-state mb-3">No comments yet</div>
+    {% endif %}
 
-      {# Static demo form (disabled submit) #}
-      <form class="card p-3">
-        <div class="row g-2">
-          <div class="col-md-4">
-            <label class="form-label">Your name</label>
-            <input type="text" class="form-control" placeholder="e.g., Jack" required>
-          </div>
-          <div class="col-12">
-            <label class="form-label">Comment</label>
-            <textarea class="form-control" rows="3" placeholder="Write your comment…" required></textarea>
-          </div>
-          <div class="col-12">
-            <button class="btn btn-outline-primary" type="submit" disabled>Post Comment</button>
-          </div>
+    <!-- Demo comment form (disabled submit) -->
+    <div class="comment-card">
+      <div class="mb-2 fw-semibold">Add a comment</div>
+      <div class="row g-2">
+        <div class="col-md-4">
+          <label class="form-label">Your name</label>
+          <input type="text" class="form-control" placeholder="e.g., Jack" required>
         </div>
-      </form>
-    </section>
+        <div class="col-12">
+          <label class="form-label">Comment</label>
+          <textarea class="form-control" rows="3" placeholder="Write your comment…" required></textarea>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-outline-primary" type="button" disabled>Post Comment</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Booking panel -->
-<aside class="col-lg-4">
-  {% set can_book = (event.status == 'Open') %}
-  <div class="card shadow-sm sticky-side">
-    <div class="card-body">
-      <h2 class="h6 mb-3">Book Tickets</h2>
+  <!-- RIGHT: Booking panel -->
+  <aside class="col-lg-4">
+    {% set can_book = (event.status == 'Open') %}
+    <div class="booking-card sticky-side">
+      <h3>Book Tickets</h3>
 
-      <div class="small text-muted mb-2">
+      <div class="booking-meta">
         {% if can_book %}
-          Tickets available: <b>120</b>
+          Tickets available: <strong>120</strong>
         {% else %}
-          <b>Booking unavailable ({{ event.status }})</b>
+          <strong>Booking unavailable ({{ event.status }})</strong>
         {% endif %}
       </div>
 
       <form method="POST" action="{{ url_for('main.create_booking') }}">
-        {{ form.csrf_token }}
-
-        {{ form.event_id }}
+        {{ form.hidden_tag() }}  {# includes CSRF + hidden fields #}
 
         <label class="form-label">{{ form.ticket_type.label }}</label>
-        {{ form.ticket_type(class="form-select form-select-sm mb-2", disabled=not can_book) }}
+        {{ form.ticket_type(class="form-select mb-3", disabled=not can_book) }}
 
         <label class="form-label">{{ form.quantity.label }}</label>
-        {{ form.quantity(class="form-control form-control-sm mb-3", min="1", disabled=not can_book) }}
+        {{ form.quantity(class="form-control mb-3", min="1", disabled=not can_book) }}
 
-        {{ form.submit(class="btn btn-primary w-100 mb-2", disabled=not can_book) }}
+        {{ form.submit(class="btn btn-primary w-100 mb-3", disabled=not can_book) }}
       </form>
 
-      <a class="btn btn-outline-secondary w-100"
-         href="{{ url_for('main.booking') }}">
+      <a class="btn btn-outline-secondary w-100" href="{{ url_for('main.booking') }}">
         View Booking History
       </a>
     </div>
-  </div>
-</aside>
+  </aside>
+</div>
 {% endblock %}
