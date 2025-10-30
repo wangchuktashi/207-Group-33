@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms.fields import TextAreaField, IntegerField,HiddenField,  SubmitField, StringField, PasswordField, SelectField, DateTimeLocalField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, AnyOf, NumberRange
+from wtforms.validators import InputRequired, Length, Email, EqualTo, AnyOf, NumberRange, Optional
 from flask_wtf.file import FileRequired, FileField, FileAllowed
 from datetime import datetime
 
@@ -67,7 +67,7 @@ class EventForm(FlaskForm):
     image = FileField('Event Image', validators=[
         FileRequired(message = 'Image cannot be empty'),
         FileAllowed(ALLOWED_FILE, message='Only supports png, jpg, JPG, PNG')])
-    description = TextAreaField('Description', validators=[InputRequired(message='Short description for attendees...')])
+    description = TextAreaField('Event description', validators=[Optional(), Length(max=5000)])
     submit = SubmitField("Create Event")
     reset = SubmitField("Reset")
 

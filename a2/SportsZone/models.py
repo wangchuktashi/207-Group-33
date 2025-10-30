@@ -37,18 +37,18 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'))
-    # not unique: you want many Football events
+
     sports_type = db.Column(db.String(64), index=True)
     event_title = db.Column(db.String(256))
     home_team_name = db.Column(db.String(64))
     away_team_name = db.Column(db.String(64))
     event_image = db.Column(db.String(256))
-    # use callables so the time is set when rows are created
-    start_datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    end_datetime = db.Column(db.DateTime, default=datetime.utcnow)
 
-    comments = db.relationship('Comment', backref='event', lazy=True)
-    venue = db.relationship('Venue', backref='events')
+    # NEW
+    description = db.Column(db.Text, nullable=True)
+
+    start_datetime = db.Column(db.DateTime, default=datetime.utcnow)
+    end_datetime   = db.Column(db.DateTime, default=datetime.utcnow)
 
     # ---------- properties used by your templates ----------
     @property
@@ -148,3 +148,4 @@ class Ticket(db.Model):
 
     def __repr__(self):
         return f"<Ticket {self.id}>"
+    

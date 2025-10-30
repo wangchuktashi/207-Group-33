@@ -102,3 +102,63 @@ body { background-color:#a7f3d0; }
   .toolbar{ flex-direction:column; align-items:stretch; }
   .toolbar form{ width:100%; margin-left:0 !important; }
 }
+
+
+/* === Share Modal (CSS-only via :target) === */
+.share-modal{
+  position:fixed; inset:0; display:none;
+  background:rgba(0,0,0,.45);
+  z-index:1050; /* above page content */
+}
+.share-modal:target{ display:flex; align-items:center; justify-content:center; }
+
+.share-dialog{
+  width:min(680px, 92vw);
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 24px 48px rgba(0,0,0,.25);
+  padding:22px 22px 18px;
+  position:relative;
+}
+
+.share-close{
+  position:absolute; top:10px; right:12px;
+  font-size:28px; line-height:1; text-decoration:none; color:#6b7280;
+}
+.share-close:hover{ color:#111827; }
+
+.share-title{
+  margin:6px 0 14px; text-align:center;
+  font-weight:700; color:#111827;
+}
+
+.share-icons{
+  display:flex; gap:18px; justify-content:center; align-items:center;
+  margin:10px 0 20px;
+}
+
+.share-circle{
+  width:56px; height:56px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:#f3f4f6; color:#363b5a; text-decoration:none;
+  font-weight:800; font-size:22px;
+  transition:transform .18s ease, background .18s ease;
+}
+.share-circle:hover{ background:#e9ecf6; transform:translateY(-2px); }
+
+.share-label{ display:block; font-size:.92rem; color:#4b5563; margin:4px 0 8px; }
+
+.share-url{
+  display:flex; align-items:center; gap:8px;
+  border:1px solid #d1d5db; border-radius:8px; padding:8px 10px;
+}
+.share-url input{
+  border:0; outline:0; flex:1; font-size:.95rem; color:#111827;
+}
+.share-open{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; color:#3b5bff; text-decoration:none;
+}
+.share-open svg{ width:20px; height:20px; display:block; }
+
+

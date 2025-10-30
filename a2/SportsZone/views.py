@@ -80,7 +80,8 @@ def create_event():
             away_team_name   = form.away_team.data,
             start_datetime   = form.start_datetime.data,
             end_datetime     = form.end_datetime.data,
-            event_image      = filename or ""
+            event_image      = filename or "",
+            description      = form.description.data  # ← NEW
         )
         if venue:
             event.venue = venue  # sets venue_id via relationship
