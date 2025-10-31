@@ -188,6 +188,37 @@ def delete_booking(booking_id):
     flash(f"Booking ID BK-{booking_id} deleted successfully.", "info")
     return redirect(url_for('main.booking'))
 
+# =========================
+# UPDATE EVENT (requires login)
+# =========================
+@main_bp.route('/update-event/<int:event_id>', methods=['GET', 'POST'], endpoint='update_event')
+@login_required
+def update_event(event_id):
+    event = Event.query.get_or_404(event_id)
+
+    # Ensure only the event creator can edit
+    if event.creator_id != current_user.id:
+        flash("You can only edit your own events.", "danger")
+        return redirect(url_for('index'))
+
+    form = EventForm(obj=event)  #Pre-fill form with existing event data
+
+    if form.validate_on_submit():
+        # Update fields from form input
+        event.title = form.title.data
+        event.category = form.category.data
+        event.description = form.description.data
+        event.venue = form.venue.data
+        event.date = form.date.data
+        event.tickets = form.tickets.data
+        event.image = form.image.data
+
+        db.session.commit()
+        flash("Event details updated successfully!", "success")
+        return redirect(url_for('event_details', event_id=event.id))
+
+    return render_template('create_event.html', form=form, editing=True)
+
 # ---------- helper: save upload to static/img and return filename ----------
 def _save_upload(form):
     file_field = getattr(form, 'image', None)
