@@ -42,12 +42,30 @@ def index():
 @main_bp.route('/event/<int:event_id>', endpoint='view_event')
 def view_event(event_id):
     e = Event.query.get_or_404(event_id)
-
-    form = BookingForm()
-    form.event_id.data = e.id  # pre-fill hidden field
-    form.quantity.data = 1     # default
-
+    form = CommentForm()
     return render_template('event.html', title=e.title, event=e, form=form)
+
+# login required for posting comment
+@mainbp.route('/event/<int:event_id>/comment', methods=["POST"])
+@login_required
+def add_comment(event_id):
+    e = Event.query.get_or_404(event_id)
+    form = CommentForm()
+
+    if form.validate_on_submit():
+        comment = Comment(
+            text=form.text.data,
+            user_id=current_user.id,
+            event_id=e.id
+        )
+        db.session.add(comment)
+        db.session.commit()
+        flash("Comment added!", "success")
+    else:
+        flash("Error submitting comment.", "danger")
+
+    return redirect(url_for("main.view_event", event_id=event_id))
+    
 # ---------- Create event via WTForms + upload (login required) ----------
 @main_bp.route('/create-event', methods=['GET', 'POST'], endpoint='create_event')
 @login_required
@@ -130,7 +148,6 @@ def booking():
         orders=orders
     )
 
-
 # =========================
 # CREATE A BOOKING (requires login)
 # called via POST (e.g. "Book Now" button on event page)
@@ -174,46 +191,6 @@ def delete_booking(booking_id):
     db.session.commit()
     flash(f"Booking ID BK-{booking_id} deleted successfully.", "info")
     return redirect(url_for('main.booking'))
-
-# =========================
-# EVENT DETAILS
-# =========================
-@app.route('/event/<int:event_id>', methods=['GET', 'POST'])
-def event_details(event_id):
-    event = Event.query.get_or_404(event_id)
-    form = CommentForm()
-    booking = BookingForm()
-
-    if booking.validate_on_submit():
-        if not current_user.is_authenticated:
-            flash("Please log in to book tickets.", "warning")
-            return redirect(url_for('login'))
-
-        qty = booking.quantity.data
-        if qty > event.tickets:
-            flash("Not enough tickets available.", "danger")
-        else:
-            event.tickets -= qty
-            new_booking = Booking(user_id=current_user.id, event_id=event.id, quantity=qty)
-            db.session.add(new_booking)
-            db.session.commit()
-            flash("Booking successful!", "success")
-            return redirect(url_for('event_details', event_id=event.id))
-
-    # Redirect to login if not authenticated before commenting
-    if form.validate_on_submit():
-        if not current_user.is_authenticated:
-            flash("Please log in to post a comment.", "warning")
-            return redirect(url_for('login'))
-
-        comment = Comment(text=form.text.data, user_id=current_user.id, event_id=event.id)
-        db.session.add(comment)
-        db.session.commit()
-        flash("Comment added successfully!", "success")
-        return redirect(url_for('event_details', event_id=event.id))
-
-    comments = Comment.query.filter_by(event_id=event.id).order_by(Comment.created_at.desc()).all()
-    return render_template('event.html', event=event, form=form, comments=comments, booking=booking)
 
 # =========================
 # UPDATE EVENT (requires login)
@@ -270,4 +247,5 @@ def _save_upload(form):
 
     # store only the filename in DB
     return filename
+
 
