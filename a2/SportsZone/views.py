@@ -70,7 +70,7 @@ def view_event(event_id):
         comments=comments,        # 🔽 pass to template
     )
 # ---------- Create event via WTForms + upload (login required) ----------
-@main_bp.route('/create-event', methods=['GET', 'POST'], endpoint='create_event')
+@main_bp.route('/create-event/', methods=['GET', 'POST'], endpoint='create_event')
 @login_required
 def create_event():
     form = EventForm()
