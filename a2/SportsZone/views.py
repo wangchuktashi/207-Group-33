@@ -6,8 +6,8 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from . import db
-from .models import Event, EventStatus, Venue, Comment, Booking # (Comment is here if you add posting later)
-from .forms import EventForm, CommentForm , BookingForm               # EventForm is used below
+from .models import Event, EventStatus, Venue, Comment, Booking
+from .forms import EventForm, CommentForm, BookingForm
 
 main_bp = Blueprint('main', __name__)
 
@@ -43,11 +43,32 @@ def index():
 def view_event(event_id):
     e = Event.query.get_or_404(event_id)
 
-    form = BookingForm()
-    form.event_id.data = e.id  # pre-fill hidden field
-    form.quantity.data = 1     # default
+    # Booking form
+    booking_form = BookingForm()
+    booking_form.event_id.data = e.id
+    if getattr(booking_form, "quantity", None):
+        booking_form.quantity.data = 1
 
-    return render_template('event.html', title=e.title, event=e, form=form)
+    # Comment form
+    comment_form = CommentForm()
+
+    # 🔽 Explicitly load comments newest-first
+    comments = (
+        Comment.query
+        .filter_by(event_id=e.id)
+        .order_by(Comment.posted_date.desc())
+        .all()
+    )
+
+    page_title = e.event_title or getattr(e, "title", e.event_title)
+    return render_template(
+        "event.html",
+        title=page_title,
+        event=e,
+        booking_form=booking_form,
+        comment_form=comment_form,
+        comments=comments,        # 🔽 pass to template
+    )
 # ---------- Create event via WTForms + upload (login required) ----------
 @main_bp.route('/create-event', methods=['GET', 'POST'], endpoint='create_event')
 @login_required
@@ -55,10 +76,10 @@ def create_event():
     form = EventForm()
 
     # If user clicked reset, just reload the form
-    if form.reset.data:
+    if getattr(form, "reset", None) and form.reset.data:
         return redirect(url_for('main.create_event'))
 
-    if form.validate_on_submit() and form.submit.data:
+    if form.validate_on_submit() and getattr(form, "submit", None) and form.submit.data:
         # save upload (returns filename or None)
         filename = _save_upload(form)
 
@@ -81,7 +102,7 @@ def create_event():
             start_datetime   = form.start_datetime.data,
             end_datetime     = form.end_datetime.data,
             event_image      = filename or "",
-            description      = form.description.data  # ← NEW
+            description      = form.description.data
         )
         if venue:
             event.venue = venue  # sets venue_id via relationship
@@ -91,18 +112,17 @@ def create_event():
         db.session.add(EventStatus(event_id=event.id, event_status="Open"))
         db.session.commit()
 
-        # After a successful create, you can redirect back to the form or to the new event
         return redirect(url_for('main.view_event', event_id=event.id))
 
     return render_template('create_event.html', form=form, title="Create Event")
 
-# ---------- Booking page (leave as-is) ----------
+# ---------- Booking page ----------
 @main_bp.route('/booking', methods=['GET'], endpoint='booking')
 @login_required
 def booking():
     rows = (
         db.session.query(Booking, Event, Venue)
-        .filter(Booking.user_id == current_user.id)  # show only my bookings now
+        .filter(Booking.user_id == current_user.id)
         .join(Event, Booking.event_id == Event.id, isouter=True)
         .join(Venue, Event.venue_id == Venue.id, isouter=True)
         .order_by(Booking.booking_date.desc())
@@ -125,20 +145,15 @@ def booking():
             "sport": e.sports_type if e else "",
         })
 
-    return render_template(
-        'booking.html',
-        title="Booking History",
-        orders=orders
-    )
-
+    return render_template('booking.html', title="Booking History", orders=orders)
 
 # =========================
 # CREATE A BOOKING (requires login)
-# called via POST (e.g. "Book Now" button on event page)
 # =========================
 @main_bp.route('/book', methods=['POST'], endpoint='create_booking')
 @login_required
 def create_booking():
+    # Prefer the form hidden field but accept raw value too
     event_id = request.form.get('event_id', type=int)
     qty = request.form.get('quantity', default=1, type=int)
 
@@ -151,7 +166,6 @@ def create_booking():
         flash("Event not found.", "warning")
         return redirect(url_for('main.index'))
 
-    # clamp quantity
     qty = max(1, min(qty, 100))
 
     booking = Booking(
@@ -164,11 +178,9 @@ def create_booking():
 
     flash("Your booking was created!", "success")
     return redirect(url_for('main.booking'))
-# --------------------------------------------------
-# no login for testing
-# --------------------------------------------------
+
+# ---------- Delete a booking (left open for your testing) ----------
 @main_bp.route('/delete-booking/<int:booking_id>', methods=['POST'], endpoint='delete_booking')
-# @login_required  #  Disabled login requirement for testing
 def delete_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     db.session.delete(booking)
@@ -198,5 +210,20 @@ def _save_upload(form):
         # Keep it simple per your request: on error, just skip storing a file
         return None
 
-    # store only the filename in DB
     return filename
+
+# ---------- Add a comment (requires login) ----------
+@main_bp.route('/event/<int:event_id>/comment', methods=["POST"])
+@login_required
+def add_comment(event_id):
+    e = Event.query.get_or_404(event_id)
+    form = CommentForm()
+    if form.validate_on_submit():
+        db.session.add(Comment(text=form.text.data,
+                               user_id=current_user.id,
+                               event_id=e.id))
+        db.session.commit()
+        flash("Comment added!", "success")
+    else:
+        flash("Error submitting comment.", "danger")
+    return redirect(url_for("main.view_event", event_id=event_id))

@@ -10,44 +10,47 @@
 {% block body %}
 
 <!-- Hero Carousel -->
-<div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000" data-bs-pause="hover">
+<div id="miniHero" class="carousel slide hero" data-bs-ride="carousel" data-bs-interval="4200">
   <div class="carousel-indicators">
-    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    <button type="button" data-bs-target="#miniHero" data-bs-slide-to="0" class="active" aria-current="true"></button>
+    <button type="button" data-bs-target="#miniHero" data-bs-slide-to="1"></button>
+    <button type="button" data-bs-target="#miniHero" data-bs-slide-to="2"></button>
   </div>
 
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="{{ url_for('static', filename='img/carousel1.jpg') }}" class="d-block hero-img" alt="Football">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>International Football</h5><p>Weekend match under lights.</p>
+      <img class="item-img" src="{{ url_for('static', filename='img/carousel1.jpg') }}" alt="Football">
+      <div class="carousel-caption text-start">
+        <h5 class="fw-bold mb-1">International Football</h5>
+        <small>Weekend match under lights.</small>
       </div>
     </div>
     <div class="carousel-item">
-      {# note: your file is named 'carousal2.jpg' in your assets #}
-      <img src="{{ url_for('static', filename='img/carousal2.jpg') }}" class="d-block hero-img" alt="Basketball">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Basketball League</h5><p>Fast breaks and big plays.</p>
+      <img class="item-img" src="{{ url_for('static', filename='img/carousal2.jpg') }}" alt="Basketball">
+      <div class="carousel-caption text-start">
+        <h5 class="fw-bold mb-1">Basketball League</h5>
+        <small>Fast breaks. Big plays.</small>
       </div>
     </div>
     <div class="carousel-item">
-      <img src="{{ url_for('static', filename='img/carousel3.jpg') }}" class="d-block hero-img" alt="Tennis">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Tennis Championship</h5><p>Don’t miss the clash.</p>
+      <img class="item-img" src="{{ url_for('static', filename='img/carousel3.jpg') }}" alt="Tennis">
+      <div class="carousel-caption text-start">
+        <h5 class="fw-bold mb-1">Tennis Championship</h5>
+        <small>Don’t miss the clash.</small>
       </div>
     </div>
   </div>
 
-  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
+  <button class="carousel-control-prev" type="button" data-bs-target="#miniHero" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+    <span class="visually-hidden">Prev</span>
   </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+  <button class="carousel-control-next" type="button" data-bs-target="#miniHero" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
     <span class="visually-hidden">Next</span>
   </button>
 </div>
+
 
 <!-- Browse + Search toolbar -->
 <div class="container pt-4">
