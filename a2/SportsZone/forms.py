@@ -87,5 +87,5 @@ class BookingForm(FlaskForm):
 # user comment form
 class CommentForm(FlaskForm):
     text = TextAreaField('Comment', [InputRequired()])
-    submit = SubmitField('Create')
+    submit = SubmitField('Post Comment')
     
