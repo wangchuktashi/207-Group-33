@@ -178,18 +178,6 @@ def create_booking():
     flash("Your booking was created!", "success")
     return redirect(url_for('main.booking'))
 
-# ---------- Delete a booking (protect if needed) ----------
-@main_bp.route('/delete-booking/<int:booking_id>', methods=['POST'], endpoint='delete_booking')
-@login_required
-def delete_booking(booking_id):
-    booking = Booking.query.get_or_404(booking_id)
-    if booking.user_id != current_user.id:
-        flash("Not allowed.", "danger")
-        return redirect(url_for('main.booking'))
-    db.session.delete(booking)
-    db.session.commit()
-    flash(f"Booking ID BK-{booking_id} deleted successfully.", "info")
-    return redirect(url_for('main.booking'))
 
 # ---------- helper: save upload to static/img and return filename ----------
 def _save_upload(form):
