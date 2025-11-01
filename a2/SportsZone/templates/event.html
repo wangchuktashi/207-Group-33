@@ -172,6 +172,10 @@
       <a class="btn btn-outline-secondary w-100" href="{{ url_for('main.booking') }}">
         View Booking History
       </a>
+
+      <a href="{{ url_for('update_event', event_id=event.id) }}" class="btn btn-outline-primary">
+        Edit Event
+      </a>
     </div>
   </aside>
 </div> <!-- /.row -->
