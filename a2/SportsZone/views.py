@@ -265,7 +265,6 @@ def add_comment(event_id):
         flash("Comment added!", "success")
     else:
         flash("Error submitting comment.", "danger")
-<<<<<<< HEAD
     return redirect(url_for("main.view_event", event_id=event_id))
 
 @main_bp.route('/event/<int:event_id>/cancel', methods=['POST'], endpoint='cancel_event')
@@ -279,6 +278,3 @@ def cancel_event(event_id):
     db.session.commit()
     flash("Event cancelled.", "info")
     return redirect(url_for('main.create_event', event_id=event.id))
-=======
-    return redirect(url_for("main.view_event", event_id=event_id))
->>>>>>> f4651106a621919c639157f96091d035e54a4f24
