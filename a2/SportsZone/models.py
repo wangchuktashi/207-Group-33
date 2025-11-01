@@ -45,12 +45,10 @@ class Venue(db.Model):
 # -------------------- Events --------------------
 class Event(db.Model):
     __tablename__ = "events"
-<<<<<<< HEAD
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'))
-=======
->>>>>>> 5bb00b266d03f599965e62d7995c6314eb4aedc0
 
     id              = db.Column(db.Integer, primary_key=True)
     user_id         = db.Column(db.Integer, db.ForeignKey("users.id"))      # creator/owner (optional)
