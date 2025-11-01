@@ -127,6 +127,24 @@
     <section class="mt-4">
       <h2 class="h6 mb-3">Comments</h2>
       <ul class="list-group mb-3">
+<<<<<<< HEAD
+      {% if comments and comments|length > 0 %}
+        {% for c in comments %}
+          <li class="list-group-item d-flex flex-column">
+            <div class="small text-muted">
+              <strong>
+                {{ (c.user.first_name ~ ' ' ~ c.user.surname) if c.user else 'Anon' }}
+              </strong>
+              · {{ c.created_at }}
+            </div>
+            <div>{{ c.text }}</div>
+          </li>
+        {% endfor %}
+      {% else %}
+        <li class="list-group-item text-muted">No comments yet</li>
+      {% endif %}
+    </ul>
+=======
         {% for c in comments or event.comments %}
           <li class="list-group-item d-flex flex-column">
             <div class="small text-muted">
@@ -138,6 +156,7 @@
           <li class="list-group-item text-muted">No comments yet</li>
         {% endfor %}
       </ul>
+>>>>>>> 5bb00b266d03f599965e62d7995c6314eb4aedc0
 
       <form method="POST" action="{{ url_for('main.add_comment', event_id=event.id) }}">
         {{ comment_form.hidden_tag() }}
