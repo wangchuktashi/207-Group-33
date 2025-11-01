@@ -166,7 +166,7 @@ def create_booking():
         flash("Event not found.", "warning")
         return redirect(url_for('main.index'))
 
-    qty = max(1, min(qty, 100))
+    qty = max(1, min(qty, 50000))
 
     booking = Booking(
         user_id=current_user.id,
