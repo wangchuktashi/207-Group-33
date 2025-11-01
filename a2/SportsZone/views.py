@@ -156,7 +156,7 @@ def create_booking():
     if not event:
         flash("Event not found.", "warning")
         return redirect(url_for('main.index'))
-    qty = max(1, min(qty, 100)) 
+    qty = max(1, min(qty, 50000)) 
     booking = Booking(event_id=event.id, booking_quantity=qty)
     db.session.add(booking)
     db.session.commit()
