@@ -1,15 +1,44 @@
 {% extends "base.html" %}
-{% block title %}{{ event.title }} · SportsZone{% endblock %}
+{% block title %}{{ event.event_title }} · SportsZone{% endblock %}
+
+{% block extra_css %}
+<style>
+  .event-hero{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.18);margin-top:.5rem}
+  .hero-banner{width:100%;height:44vh;object-fit:cover;filter:brightness(.9)}
+  .hero-overlay{position:absolute;left:16px;bottom:16px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.7)}
+  .hero-title{margin:0;font-weight:700}
+  .hero-subtitle{margin:2px 0 0}
+  .event-actions{display:flex;justify-content:space-between;align-items:center;margin:.75rem 0 1rem}
+  .low-inventory{display:inline-flex;gap:.5rem;align-items:center;background:#ffefed;border:1px solid #ffd9d4;border-radius:14px;padding:.35rem .6rem;font-weight:700}
+  .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;border:1px solid #dfe6ff;background:#f4f7ff;color:#3b5bff;text-decoration:none}
+  .icon-btn:hover{background:#eef3ff;border-color:#cfd9ff}
+  .icon-btn svg{width:20px;height:20px}
+  .info-list{margin:0;padding:0}
+  .info-list dt{width:120px;float:left;clear:left;font-weight:600;color:#0f2f28;padding:.4rem 0}
+  .info-list dd{margin-left:130px;padding:.4rem 0;color:#1f2937}
+  @media (max-width: 575px){ .info-list dt{width:100px} .info-list dd{margin-left:110px} }
+  @media (min-width:992px){ .sticky-side{position:sticky;top:1rem} }
+  .booking-card{border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 10px 24px rgba(0,0,0,.1);padding:1.1rem;background:#fff}
+  .share-modal{position:fixed;inset:0;display:none;background:rgba(0,0,0,.5);z-index:1050}
+  .share-modal:target{display:block}
+  .share-dialog{max-width:520px;margin:8vh auto;background:#fff;border-radius:14px;padding:1rem 1.25rem}
+  .share-close{float:right;font-size:1.6rem;line-height:1;text-decoration:none;color:#111}
+  .share-title{margin:.25rem 0 1rem;font-weight:700}
+  .share-icons{display:flex;gap:.5rem;margin-bottom:.75rem}
+  .share-circle{width:40px;height:40px;border-radius:999px;background:#f3f4f6;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#111;text-decoration:none}
+  .share-url{display:flex;gap:.5rem;align-items:center}
+  .share-url input{flex:1}
+  .share-open svg{width:20px;height:20px}
+</style>
+{% endblock %}
 
 {% block body %}
-<!-- Hero banner -->
+<!-- Hero -->
 <div class="event-hero mb-3">
-  <img
-    src="{{ url_for('static', filename='img/' ~ (event.hero_image or event.image or 'placeholder.jpg')) }}"
-    alt="{{ event.title }}"
-    class="img-fluid hero-banner">
+  <img src="{{ url_for('static', filename='img/' ~ (event.event_image or 'placeholder.jpg')) }}"
+       alt="{{ event.event_title }}" class="img-fluid hero-banner">
   <div class="hero-overlay">
-    <h1 class="hero-title">{{ event.title }}</h1>
+    <h1 class="hero-title h3">{{ event.event_title }}</h1>
     <p class="hero-subtitle">{{ event.venue_text }}</p>
   </div>
 </div>
@@ -17,90 +46,78 @@
 <!-- Action strip -->
 <div class="container">
   <div class="event-actions">
-    {% if event.status == 'Open' and (event.tickets_left is defined and event.tickets_left <= 30) %}
-      <span class="low-inventory"><span class="flame">🔥</span> Few tickets left</span>
+    {% set left = (event.total_tickets or 0) - (event.tickets_sold or 0) %}
+    {% if event.status == 'Open' and left <= 30 and left > 0 %}
+      <span class="low-inventory">🔥 Few tickets left</span>
     {% endif %}
-    <div class="d-flex align-items-center gap-2">
-      <!-- Share opens CSS-only modal -->
-      <a class="icon-btn" href="#share-modal" title="Share">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 16V7m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M7 16h10v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-    </div>
+    <a class="icon-btn" href="#share-modal" title="Share">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 16V7m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M7 16h10v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
   </div>
 </div>
 
-{# Teams (derived from title like "Team A vs Team B") #}
-{% set teams = event.title.split(' vs ') %}
+{# Teams from title "A vs B" if you keep that style #}
+{% set teams = (event.event_title or '') .split(' vs ') %}
 {% if teams|length == 2 %}
-<div class="d-flex justify-content-center align-items-center gap-4 mb-2">
-  <div class="text-center"><div class="small fw-bold">{{ teams[0] }}</div></div>
-  <div class="h4 mb-0">vs</div>
-  <div class="text-center"><div class="small fw-bold">{{ teams[1] }}</div></div>
-</div>
+  <div class="d-flex justify-content-center align-items-center gap-4 mb-2">
+    <div class="small fw-bold">{{ teams[0] }}</div>
+    <div class="h5 mb-0">vs</div>
+    <div class="small fw-bold">{{ teams[1] }}</div>
+  </div>
 {% endif %}
 
 <!-- Badges + meta -->
+{% set badge_map = {'Open':'primary','Sold Out':'danger','Cancelled':'secondary','Inactive':'warning'} %}
 <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
-  <span class="badge text-bg-primary">{{ event.sport }}</span>
-  <span class="badge text-bg-{{ event.badge }} badge-status">{{ event.status }}</span>
+  <span class="badge text-bg-primary">{{ event.sports_type }}</span>
+  <span class="badge text-bg-{{ badge_map.get(event.status, 'secondary') }}">{{ event.status }}</span>
 </div>
 <p class="text-muted mb-3 text-center">
-  {{ event.start_text }}{% if event.end_text %} – {{ event.end_text }}{% endif %} · {{ event.venue_text }}
+  {% if event.start_datetime %}{{ event.start_datetime.strftime('%a %d %b %Y · %I:%M %p') }}{% endif %}
+  {% if event.end_datetime %} – {{ event.end_datetime.strftime('%a %d %b %Y · %I:%M %p') }}{% endif %}
+  · {{ event.venue_text }}
 </p>
 
 <div class="row g-4">
-  <!-- LEFT: About + Comments -->
+  <!-- LEFT -->
   <div class="col-lg-8">
-    <!-- About -->
-    <h2 class="section-title">About this event</h2>
-
+    <h2 class="h5 fw-bold mb-2">About this event</h2>
     {% if event.description %}
       <p class="lead">{{ event.description }}</p>
     {% endif %}
 
     <dl class="info-list clearfix">
       <dt>Venue</dt><dd>{{ event.venue_text }}</dd>
-      <dt>Start</dt><dd>{{ event.start_text }}</dd>
-      {% if event.end_text %}<dt>End</dt><dd>{{ event.end_text }}</dd>{% endif %}
+      {% if event.start_datetime %}<dt>Start</dt><dd>{{ event.start_datetime.strftime('%a %d %b %Y · %I:%M %p') }}</dd>{% endif %}
+      {% if event.end_datetime %}<dt>End</dt><dd>{{ event.end_datetime.strftime('%a %d %b %Y · %I:%M %p') }}</dd>{% endif %}
       {% if teams|length == 2 %}<dt>Home / Away</dt><dd>{{ teams[0] }} vs {{ teams[1] }}</dd>{% endif %}
     </dl>
 
-    <!-- CSS-only Share Modal -->
+    <!-- Share Modal (CSS-only) -->
     <div id="share-modal" class="share-modal" aria-hidden="true">
       <div class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-title">
         <a class="share-close" href="#" aria-label="Close">&times;</a>
-
         <h3 id="share-title" class="share-title">Share with friends</h3>
 
         <div class="share-icons">
           <a class="share-circle" target="_blank" rel="noopener"
-             href="https://www.facebook.com/sharer/sharer.php?u={{ request.url|urlencode }}"
-             aria-label="Share on Facebook">f</a>
-
+             href="https://www.facebook.com/sharer/sharer.php?u={{ request.url|urlencode }}" aria-label="Facebook">f</a>
           <a class="share-circle" target="_blank" rel="noopener"
-             href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url|urlencode }}"
-             aria-label="Share on LinkedIn">in</a>
-
+             href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url|urlencode }}" aria-label="LinkedIn">in</a>
           <a class="share-circle" target="_blank" rel="noopener"
-             href="https://twitter.com/intent/tweet?text={{ event.title|urlencode }}&url={{ request.url|urlencode }}"
-             aria-label="Share on X/Twitter">x</a>
-
+             href="https://twitter.com/intent/tweet?text={{ event.event_title|urlencode }}&url={{ request.url|urlencode }}" aria-label="X/Twitter">x</a>
           <a class="share-circle" target="_blank" rel="noopener"
-             href="mailto:?subject={{ event.title|urlencode }}&body={{ request.url|urlencode }}"
-             aria-label="Share via Email">@</a>
+             href="mailto:?subject={{ event.event_title|urlencode }}&body={{ request.url|urlencode }}" aria-label="Email">@</a>
         </div>
 
-        <label class="share-label">Event URL</label>
+        <label class="form-label">Event URL</label>
         <div class="share-url">
-          <input type="text" value="{{ request.url }}" readonly>
-          <a class="share-open" target="_blank" rel="noopener" href="{{ request.url }}" aria-label="Open link">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M14 3h7v7M10 14L21 3M21 10v7a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4h7"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+          <input type="text" class="form-control" value="{{ request.url }}" readonly>
+          <a class="share-open btn btn-outline-secondary btn-sm" target="_blank" rel="noopener" href="{{ request.url }}" aria-label="Open link">
+            Open
           </a>
         </div>
       </div>
@@ -108,49 +125,41 @@
 
     <!-- Comments -->
     <section class="mt-4">
-      <h2 class="h5 mb-3">Comments</h2>
-
-      <!-- display comments -->
+      <h2 class="h6 mb-3">Comments</h2>
       <ul class="list-group mb-3">
-  {% if comments and comments|length > 0 %}
-    {% for c in comments %}
-      <li class="list-group-item d-flex flex-column">
-        <div class="small text-muted">
-          <strong>
-            {{ (c.user.first_name ~ ' ' ~ c.user.surname) if c.user else 'Anon' }}
-          </strong>
-          · {{ c.created_at }}
-        </div>
-        <div>{{ c.text }}</div>
-      </li>
-    {% endfor %}
-  {% else %}
-    <li class="list-group-item text-muted">No comments yet</li>
-  {% endif %}
-</ul>
+        {% for c in comments or event.comments %}
+          <li class="list-group-item d-flex flex-column">
+            <div class="small text-muted">
+              <strong>{{ (c.user.first_name ~ ' ' ~ c.user.surname) if c.user else 'Anon' }}</strong> · {{ c.created_at }}
+            </div>
+            <div>{{ c.text }}</div>
+          </li>
+        {% else %}
+          <li class="list-group-item text-muted">No comments yet</li>
+        {% endfor %}
+      </ul>
 
-      <!-- add new comment -->
       <form method="POST" action="{{ url_for('main.add_comment', event_id=event.id) }}">
         {{ comment_form.hidden_tag() }}
         <div class="mb-3">
           {{ comment_form.text.label(class="form-label") }}
           {{ comment_form.text(class="form-control", rows="3", placeholder="Write a comment...") }}
         </div>
-        <div>
-          {{ comment_form.submit(class="btn btn-primary") }}
-        </div>
+        {{ comment_form.submit(class="btn btn-primary") }}
       </form>
     </section>
-  </div>  {# /col-lg-8 #}
+  </div>
 
-  <!-- RIGHT: Booking panel -->
+  <!-- RIGHT -->
   <aside class="col-lg-4">
-    {% set can_book = (event.status == 'Open') %}
+    {% set left = (event.total_tickets or 0) - (event.tickets_sold or 0) %}
+    {% set can_book = (event.status == 'Open' and left > 0) %}
     <div class="booking-card sticky-side">
-      <h3>Book Tickets</h3>
-      <div class="booking-meta">
+      <h3 class="h6 fw-bold">Book Tickets</h3>
+      <div class="booking-meta mb-2">
         {% if can_book %}
-          Tickets available: <strong>{{ event.tickets_left if event.tickets_left is defined else 120 }}</strong>
+          Tickets available: <strong>{{ left }}</strong>
+          {% if left <= 30 %}<span class="text-danger ms-1">(few left)</span>{% endif %}
         {% else %}
           <strong>Booking unavailable ({{ event.status }})</strong>
         {% endif %}
@@ -158,25 +167,20 @@
 
       <form method="POST" action="{{ url_for('main.create_booking') }}">
         {{ booking_form.hidden_tag() }}
-        {{ booking_form.event_id() }} {# hidden field #}
-
+        {{ booking_form.event_id() }}
         <label class="form-label">{{ booking_form.ticket_type.label }}</label>
         {{ booking_form.ticket_type(class="form-select mb-3", disabled=not can_book) }}
 
         <label class="form-label">{{ booking_form.quantity.label }}</label>
         {{ booking_form.quantity(class="form-control mb-3", min="1", disabled=not can_book) }}
 
-        {{ booking_form.submit(class="btn btn-primary w-100 mb-3", disabled=not can_book) }}
+        {{ booking_form.submit(class="btn btn-primary w-100 mb-2", disabled=not can_book) }}
       </form>
 
-      <a class="btn btn-outline-secondary w-100" href="{{ url_for('main.booking') }}">
-        View Booking History
-      </a>
-
-      <a href="{{ url_for('main.update_event', event_id=event.id) }}" class="btn btn-outline-primary">
-        Edit Event
-      </a>
+      <a class="btn btn-outline-secondary w-100" href="{{ url_for('main.booking') }}">View Booking History</a>
+      {# Keep edit link only if you wire an edit view with correct fields #}
+      {# <a href="{{ url_for('main.update_event', event_id=event.id) }}" class="btn btn-outline-primary w-100 mt-2">Edit Event</a> #}
     </div>
   </aside>
-</div> <!-- /.row -->
+</div>
 {% endblock %}

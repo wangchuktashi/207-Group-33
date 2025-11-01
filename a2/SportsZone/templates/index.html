@@ -8,7 +8,6 @@
 {% endblock %}
 
 {% block body %}
-
 <!-- Hero Carousel -->
 <div id="miniHero" class="carousel slide hero" data-bs-ride="carousel" data-bs-interval="4200">
   <div class="carousel-indicators">
@@ -26,7 +25,7 @@
       </div>
     </div>
     <div class="carousel-item">
-      <img class="item-img" src="{{ url_for('static', filename='img/carousal2.jpg') }}" alt="Basketball">
+      <img class="item-img" src="{{ url_for('static', filename='img/carousel2.jpg') }}" alt="Basketball">
       <div class="carousel-caption text-start">
         <h5 class="fw-bold mb-1">Basketball League</h5>
         <small>Fast breaks. Big plays.</small>
@@ -50,7 +49,6 @@
     <span class="visually-hidden">Next</span>
   </button>
 </div>
-
 
 <!-- Browse + Search toolbar -->
 <div class="container pt-4">
@@ -91,22 +89,23 @@
 
 <!-- Events grid -->
 <div class="container py-4">
+  {% set badge_map = {'Open':'primary','Sold Out':'danger','Cancelled':'secondary','Inactive':'warning'} %}
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
     {% for e in events %}
-      <div class="col event" data-category="{{ e.sport|lower }}" data-status="{{ e.status|lower }}">
+      <div class="col event" data-category="{{ (e.sports_type or '')|lower }}" data-status="{{ (e.status or '')|lower }}">
         <div class="card h-100">
           <div class="card-media">
-            <img src="{{ url_for('static', filename='img/' ~ (e.image or 'placeholder.jpg')) }}"
-                 alt="{{ e.title or e.sport or 'Event' }}">
+            <img src="{{ url_for('static', filename='img/' ~ (e.event_image or 'placeholder.jpg')) }}"
+                 alt="{{ e.event_title or e.sports_type or 'Event' }}">
           </div>
           <div class="card-body d-flex flex-column">
             <div class="d-flex justify-content-between mb-2">
-              <span class="badge text-bg-primary">{{ e.sport }}</span>
-              <span class="badge text-bg-{{ e.badge }}">{{ e.status }}</span>
+              <span class="badge text-bg-primary">{{ e.sports_type }}</span>
+              <span class="badge text-bg-{{ badge_map.get(e.status, 'secondary') }}">{{ e.status }}</span>
             </div>
-            <h5 class="card-title mb-1">{{ e.title }}</h5>
+            <h5 class="card-title mb-1">{{ e.event_title }}</h5>
             <p class="card-text text-muted small mb-2">
-              <strong>{{ e.start_text }}</strong><br>
+              <strong>{{ e.start_datetime.strftime('%a %d %b %Y · %I:%M %p') if e.start_datetime else '' }}</strong><br>
               {{ e.venue_text }}
             </p>
             <a href="{{ url_for('main.view_event', event_id=e.id) }}" class="btn btn-primary mt-auto">View Details</a>

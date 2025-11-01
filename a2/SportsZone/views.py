@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 
 from . import db
-from .models import Event, EventStatus, Venue, Comment, Booking
+from .models import Event, Venue, Comment, Booking
 from .forms import EventForm, CommentForm, BookingForm
 
 main_bp = Blueprint('main', __name__)
@@ -21,16 +21,15 @@ def index():
 
     query = Event.query
     if cat != 'all':
-        query = query.filter(Event.sports_type.ilike(cat))
+        query = query.filter(Event.sports_type.ilike(f"%{cat}%"))
 
     events = query.order_by(Event.start_datetime.asc()).all()
 
-    # Apply status + search filters using the properties
     def ok(e: Event) -> bool:
-        if st != 'all' and e.status.lower() != st:
+        if st != 'all' and (e.status or "").lower() != st:
             return False
         if q:
-            hay = f"{e.title} {e.sport} {e.venue_text}".lower()
+            hay = f"{e.event_title} {e.sports_type} {e.venue_text}".lower()
             if q not in hay:
                 return False
         return True
@@ -52,35 +51,34 @@ def view_event(event_id):
     # Comment form
     comment_form = CommentForm()
 
-    # 🔽 Explicitly load comments newest-first
+    # Comments newest-first (model uses created_at)
     comments = (
         Comment.query
         .filter_by(event_id=e.id)
-        .order_by(Comment.posted_date.desc())
+        .order_by(Comment.created_at.desc())
         .all()
     )
 
-    page_title = e.event_title or getattr(e, "title", e.event_title)
+    page_title = e.event_title
     return render_template(
         "event.html",
         title=page_title,
         event=e,
         booking_form=booking_form,
         comment_form=comment_form,
-        comments=comments,        # 🔽 pass to template
+        comments=comments,
     )
+
 # ---------- Create event via WTForms + upload (login required) ----------
 @main_bp.route('/create-event/', methods=['GET', 'POST'], endpoint='create_event')
 @login_required
 def create_event():
     form = EventForm()
 
-    # If user clicked reset, just reload the form
     if getattr(form, "reset", None) and form.reset.data:
         return redirect(url_for('main.create_event'))
 
     if form.validate_on_submit() and getattr(form, "submit", None) and form.submit.data:
-        # save upload (returns filename or None)
         filename = _save_upload(form)
 
         # ensure venue exists (model stores venue_id)
@@ -93,30 +91,31 @@ def create_event():
                 db.session.add(venue)
                 db.session.flush()  # get id
 
-        # map form fields to Event model columns
+        # map form fields to Event model columns  (fixed missing comma!)
         event = Event(
-            sports_type      = form.sport_type.data,
-            event_title      = form.event_title.data,
-            home_team_name   = form.home_team.data,
-            away_team_name   = form.away_team.data,
-            start_datetime   = form.start_datetime.data,
-            end_datetime     = form.end_datetime.data,
-            event_image      = filename or "",
-            description      = form.description.data
+            user_id        = current_user.id,
+            sports_type    = form.sport_type.data,
+            event_title    = form.event_title.data,
+            home_team_name = form.home_team.data,
+            away_team_name = form.away_team.data,
+            start_datetime = form.start_datetime.data,
+            end_datetime   = form.end_datetime.data,
+            event_image    = filename or "",
+            description    = form.description.data,
+            total_tickets  = form.total_tickets.data,
+            ticket_price   = form.ticket_price.data,
+            status         = "Open",
         )
         if venue:
-            event.venue = venue  # sets venue_id via relationship
+            event.venue = venue
 
         db.session.add(event)
-        db.session.flush()
-        db.session.add(EventStatus(event_id=event.id, event_status="Open"))
         db.session.commit()
-
         return redirect(url_for('main.view_event', event_id=event.id))
 
     return render_template('create_event.html', form=form, title="Create Event")
 
-# ---------- Booking page ----------
+# ---------- Booking history ----------
 @main_bp.route('/booking', methods=['GET'], endpoint='booking')
 @login_required
 def booking():
@@ -136,24 +135,17 @@ def booking():
             "booked_at": b.booking_date.strftime("%d %b %Y, %I:%M %p") if b.booking_date else "",
             "quantity": b.booking_quantity or 1,
             "event_id": e.id if e else None,
-            "event_title": (
-                e.event_title
-                or f"{e.home_team_name} vs {e.away_team_name}"
-                if e else "Unknown Event"
-            ),
+            "event_title": (e.event_title or f"{e.home_team_name} vs {e.away_team_name}") if e else "Unknown Event",
             "image": e.event_image if e else None,
             "sport": e.sports_type if e else "",
         })
 
     return render_template('booking.html', title="Booking History", orders=orders)
 
-# =========================
-# CREATE A BOOKING (requires login)
-# =========================
+# ---------- Create a booking ----------
 @main_bp.route('/book', methods=['POST'], endpoint='create_booking')
 @login_required
 def create_booking():
-    # Prefer the form hidden field but accept raw value too
     event_id = request.form.get('event_id', type=int)
     qty = request.form.get('quantity', default=1, type=int)
 
@@ -166,58 +158,38 @@ def create_booking():
         flash("Event not found.", "warning")
         return redirect(url_for('main.index'))
 
-    qty = max(1, min(qty, 50000))
+    qty = max(1, min(qty, 10))  # align with form validator
 
+    if not event.can_book(qty):
+        flash("Not enough tickets or event closed.", "warning")
+        return redirect(url_for('main.view_event', event_id=event.id))
+
+    # create booking and apply counters
     booking = Booking(
         user_id=current_user.id,
         event_id=event.id,
         booking_quantity=qty
     )
+    event.apply_booking(qty)
+
     db.session.add(booking)
     db.session.commit()
 
     flash("Your booking was created!", "success")
     return redirect(url_for('main.booking'))
 
-# ---------- Delete a booking (left open for your testing) ----------
+# ---------- Delete a booking (protect if needed) ----------
 @main_bp.route('/delete-booking/<int:booking_id>', methods=['POST'], endpoint='delete_booking')
+@login_required
 def delete_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
+    if booking.user_id != current_user.id:
+        flash("Not allowed.", "danger")
+        return redirect(url_for('main.booking'))
     db.session.delete(booking)
     db.session.commit()
     flash(f"Booking ID BK-{booking_id} deleted successfully.", "info")
     return redirect(url_for('main.booking'))
-
-# =========================
-# UPDATE EVENT (requires login)
-# =========================
-@main_bp.route('/update-event/<int:event_id>', methods=['GET', 'POST'], endpoint='update_event')
-@login_required
-def update_event(event_id):
-    event = Event.query.get_or_404(event_id)
-
-    # Ensure only the event creator can edit
-    if event.creator_id != current_user.id:
-        flash("You can only edit your own events.", "danger")
-        return redirect(url_for('index'))
-
-    form = EventForm(obj=event)  #Pre-fill form with existing event data
-
-    if form.validate_on_submit():
-        # Update fields from form input
-        event.title = form.title.data
-        event.category = form.category.data
-        event.description = form.description.data
-        event.venue = form.venue.data
-        event.date = form.date.data
-        event.tickets = form.tickets.data
-        event.image = form.image.data
-
-        db.session.commit()
-        flash("Event details updated successfully!", "success")
-        return redirect(url_for('event_details', event_id=event.id))
-
-    return render_template('create_event.html', form=form, editing=True)
 
 # ---------- helper: save upload to static/img and return filename ----------
 def _save_upload(form):
@@ -230,7 +202,6 @@ def _save_upload(form):
     if not filename:
         return None
 
-    # Save into your app's static/img directory
     from flask import current_app
     upload_dir = os.path.join(current_app.root_path, 'static', 'img')
     os.makedirs(upload_dir, exist_ok=True)
@@ -238,21 +209,18 @@ def _save_upload(form):
     try:
         fp.save(os.path.join(upload_dir, filename))
     except Exception:
-        # Keep it simple per your request: on error, just skip storing a file
         return None
 
     return filename
 
-# ---------- Add a comment (requires login) ----------
+# ---------- Add a comment ----------
 @main_bp.route('/event/<int:event_id>/comment', methods=["POST"])
 @login_required
 def add_comment(event_id):
     e = Event.query.get_or_404(event_id)
     form = CommentForm()
     if form.validate_on_submit():
-        db.session.add(Comment(text=form.text.data,
-                               user_id=current_user.id,
-                               event_id=e.id))
+        db.session.add(Comment(text=form.text.data, user_id=current_user.id, event_id=e.id))
         db.session.commit()
         flash("Comment added!", "success")
     else:
