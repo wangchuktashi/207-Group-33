@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Update Event · SportsZone{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===== Scope everything under .create-event-page ===== */
+  .create-event-page { background-color: #eafaf5; }
+
+  .create-event-page .form-section{
+    background:#fff;border-radius:20px;padding:40px 45px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);transition:.3s;
+  }
+  .create-event-page .form-section:hover{box-shadow:0 16px 35px rgba(0,0,0,.1);}
+  .create-event-page h1{font-weight:800;color:#004d40;}
+  .create-event-page label{font-weight:600;color:#004d40;margin-bottom:6px;}
+
+  .create-event-page .form-control,
+  .create-event-page .form-select{
+    border-radius:12px;border:1px solid #cceee0;padding:10px 15px;transition:.2s;
+  }
+  .create-event-page .form-control:focus,
+  .create-event-page .form-select:focus{
+    border-color:#00bfa6;box-shadow:0 0 0 .2rem rgba(0,191,166,.25);
+  }
+
+  .create-event-page .btn-primary{
+    background:#00bfa6;border:none;border-radius:12px;font-weight:600;padding:12px 25px;
+  }
+  .create-event-page .btn-primary:hover{background:#009e8a;transform:translateY(-1px);}
+  .create-event-page .btn-outline-secondary{border-radius:12px;font-weight:600;}
+  .create-event-page .help-text{color:#6b7280;font-size:.9rem;}
+  .create-event-page .page-header{text-align:center;margin-bottom:30px;}
+  .create-event-page .page-header p{color:#607d8b;font-size:1rem;}
+
+  /* IMPORTANT: scope the max-width so it doesn't hit the navbar container */
+  @media (min-width: 992px){
+    .create-event-page .content-wrap { max-width: 800px; margin: 0 auto; }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="create-event-page py-4">
+  <div class="content-wrap">
+    <div class="page-header">
+      <h1>Update Event</h1>
+      <p>Update your published sports event on SportsZone.</p>
+    </div>
+
+    <div class="form-section">
+      <form method="POST" enctype="multipart/form-data"
+            onsubmit="this.querySelector('button[type=submit]')?.setAttribute('disabled','disabled')">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          <label>{{ form.event_title.label }}</label>
+          {{ form.event_title(class="form-control", placeholder="e.g. Real Madrid vs Barcelona") }}
+        </div>
+
+        <div class="mb-3">
+          <label>{{ form.sport_type.label }}</label>
+          {{ form.sport_type(class="form-select") }}
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>{{ form.home_team.label }}</label>
+            {{ form.home_team(class="form-control", placeholder="Home team") }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>{{ form.away_team.label }}</label>
+            {{ form.away_team(class="form-control", placeholder="Away team") }}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>{{ form.start_datetime.label }}</label>
+            {{ form.start_datetime(class="form-control") }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label>{{ form.end_datetime.label }}</label>
+            {{ form.end_datetime(class="form-control") }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label>{{ form.venue.label }}</label>
+          {{ form.venue(class="form-control", placeholder="Venue name or stadium") }}
+        </div>
+
+        <div class="mb-3">
+          <label>{{ form.total_tickets.label }}</label>
+          {{ form.total_tickets(class="form-control", placeholder="e.g. 5000") }}
+          <div class="help-text">Enter total available tickets for this event.</div>
+        </div>
+
+        <div class="mb-3">
+          <label>{{ form.image.label }}</label>
+          {{ form.image(class="form-control") }}
+          <div class="help-text">Upload a high-quality image (JPG/PNG).</div>
+        </div>
+
+        <div class="mb-3">
+          <label>{{ form.description.label }}</label>
+          {{ form.description(class="form-control", rows="5", placeholder="Write a short description…") }}
+        </div>
+
+        <div class="d-flex gap-2">
+          {{ form.submit(class="btn btn-primary") }}
+          {{ form.reset(class="btn btn-outline-secondary") }}
+          <a href="{{ url_for('main.index') }}" class="btn btn-link">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

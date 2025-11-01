@@ -36,6 +36,7 @@ class Event(db.Model):
     __tablename__ = "events"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User', backref='events')
     venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'))
 
     sports_type = db.Column(db.String(64), index=True)

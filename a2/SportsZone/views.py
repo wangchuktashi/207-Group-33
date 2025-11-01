@@ -197,7 +197,7 @@ def update_event(event_id):
     event = Event.query.get_or_404(event_id)
 
     # Ensure only the event creator can edit
-    if event.creator_id != current_user.id:
+    if event.user_id != current_user.id:
         flash("You can only edit your own events.", "danger")
         return redirect(url_for('index'))
 
