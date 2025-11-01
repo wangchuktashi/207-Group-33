@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Create Event · SportsZone{% endblock %}
+{% block title %}{{ 'Edit Event' if event else 'Create Event' }} · SportsZone{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -13,6 +13,9 @@
   .create-event-page label{font-weight:600;color:#004d40;margin-bottom:6px;}
   .create-event-page .help-text{color:#6b7280;font-size:.9rem;}
   @media (min-width: 992px){ .create-event-page .content-wrap { max-width: 800px; margin: 0 auto; } }
+
+  /* optional image preview (edit mode) */
+  .current-image{border-radius:14px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,.1);}
 </style>
 {% endblock %}
 
@@ -20,7 +23,6 @@
 
 {# ------- tiny helper macros for rendering with errors ------- #}
 {% macro field_row(field, type='text', placeholder='', rows=None, help_text=None, extra_class='') -%}
-  {# Determine invalid class if any errors #}
   {% set invalid = ' is-invalid' if field.errors else '' %}
   <div class="mb-3">
     <label class="form-label">{{ field.label }}</label>
@@ -45,8 +47,13 @@
 <div class="create-event-page py-4">
   <div class="content-wrap">
     <div class="page-header text-center mb-3">
-      <h1>Create Event</h1>
-      <p>Fill out the details to publish your sports event on SportsZone.</p>
+      {% if event %}
+        <h1>Edit Event</h1>
+        <p>Update your event details below.</p>
+      {% else %}
+        <h1>Create Event</h1>
+        <p>Fill out the details to publish your sports event on SportsZone.</p>
+      {% endif %}
     </div>
 
     {# show flashed messages if any #}
@@ -98,14 +105,35 @@
           </div>
         </div>
 
+        {# show current image (only when editing and we have one) #}
+        {% if event and event.event_image %}
+          <div class="mb-3">
+            <label class="form-label d-block">Current Image</label>
+            <div class="current-image">
+              <img src="{{ url_for('static', filename='img/' ~ event.event_image) }}" class="img-fluid" alt="{{ event.event_title }}">
+            </div>
+            <div class="form-text mt-1">Uploading a new file will replace the current image.</div>
+          </div>
+        {% endif %}
+
         {{ field_row(form.image, help_text="Upload a high-quality image (JPG/PNG).") }}
 
         {{ field_row(form.description, rows=5, placeholder="Write a short description…") }}
 
-        <div class="d-flex gap-2">
-          {{ form.submit(class="btn btn-primary") }}
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          {{ form.submit(class="btn btn-primary", value=('Save Changes' if event else 'Create Event')) }}
           {{ form.reset(class="btn btn-outline-secondary") }}
-          <a href="{{ url_for('main.index') }}" class="btn btn-link">Cancel</a>
+          <a href="{{ url_for('main.my_events') if event else url_for('main.index') }}" class="btn btn-link">Cancel</a>
+
+          {# Cancel Event action (only visible in edit mode) #}
+          {% if event %}
+            <form method="POST" action="{{ url_for('main.cancel_event', event_id=event.id) }}"
+                  onsubmit="return confirm('Cancel this event? This will stop further bookings.');" class="ms-auto">
+              <button class="btn btn-outline-danger" {% if event.status == 'Cancelled' %}disabled{% endif %}>
+                Cancel Event
+              </button>
+            </form>
+          {% endif %}
         </div>
       </form>
     </div>

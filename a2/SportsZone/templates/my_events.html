@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}My Events · SportsZone{% endblock %}
+
+{% block extra_css %}
+<style>
+  .my-events-page { padding-top: .75rem; background:#eaf7f5; }
+  .my-events-page .page-title { font-weight: 800; color: #004a46; margin-bottom: 1rem; }
+
+  .event-card{
+    border:1px solid rgba(0,0,0,.05);
+    border-radius:16px; overflow:hidden; background:#fff;
+    box-shadow:0 6px 16px rgba(0,0,0,.06);
+    transition:transform .18s ease, box-shadow .18s ease; height:100%;
+    display:flex; flex-direction:column;
+  }
+  .event-card:hover{ transform:translateY(-3px); box-shadow:0 12px 28px rgba(0,0,0,.12); }
+
+  .thumb-wrap{ position:relative; min-height:200px; background:#eaf7f5; }
+  .thumb{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+
+  .body{ padding:1rem 1.25rem 0.5rem; }
+  .title{ font-size:1.15rem; font-weight:800; margin:0; color:#0f2f28; }
+  .meta{ margin-top:.35rem; color:#6b7280; font-size:.92rem; }
+  .badge{ font-weight:700; }
+
+  .card-footer{ background:transparent; border-top:0; padding:0 1.25rem 1.1rem; margin-top:auto; }
+  .actions .btn{ border-radius:12px; font-weight:600; }
+  .btn-primary{ background:#00bfa6; border:none; }
+  .btn-primary:hover{ background:#009e8a; }
+
+  @media (max-width:767px){
+    .thumb-wrap{ min-height:160px; }
+    .body{ padding:.9rem 1rem .25rem; }
+    .card-footer{ padding:0 1rem 1rem; }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="my-events-page">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="page-title m-0">My Events</h1>
+    <a href="{{ url_for('main.create_event') }}" class="btn btn-primary">Create New Event</a>
+  </div>
+
+  {% if events %}
+    {% set badge_map = {'Open':'primary','Sold Out':'danger','Cancelled':'secondary','Inactive':'warning'} %}
+    <div class="row g-3">
+      {% for e in events %}
+        <div class="col-12 col-md-6 col-lg-4">
+          <article class="event-card">
+            <!-- image -->
+            <div class="thumb-wrap">
+              {% if e.event_image %}
+                <img class="thumb" src="{{ url_for('static', filename='img/' ~ e.event_image) }}" alt="{{ e.event_title }}">
+              {% else %}
+                <div class="thumb d-flex align-items-center justify-content-center text-uppercase fw-bold"
+                     style="background:#c8f6ef;color:#0f2f28;font-size:2rem;">
+                  {{ e.event_title[:1] if e.event_title else 'E' }}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- content -->
+            <div class="body">
+              <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-2">
+                <h2 class="title">{{ e.event_title }}</h2>
+                <span class="badge text-bg-{{ badge_map.get(e.status,'secondary') }}">{{ e.status }}</span>
+              </div>
+              <div class="meta">
+                {{ e.sports_type or 'sport' }}<br>
+                {% if e.start_datetime %}{{ e.start_datetime.strftime('%d %b %Y, %I:%M %p') }}{% endif %}<br>
+                {% if e.venue %}{{ e.venue.venue_name }}{% endif %}
+              </div>
+            </div>
+
+            <!-- actions footer (always visible) -->
+            <div class="card-footer">
+              <div class="actions d-flex flex-wrap gap-2">
+                <a href="{{ url_for('main.view_event', event_id=e.id) }}"
+                   class="btn btn-outline-secondary btn-sm">View</a>
+
+                <a href="{{ url_for('main.create_event', event_id=e.id) }}"
+                   class="btn btn-primary btn-sm">Edit</a>
+
+                <form method="POST"
+                      action="{{ url_for('main.cancel_event', event_id=e.id) }}"
+                      onsubmit="return confirm('Cancel this event? This will stop further bookings.');"
+                      class="d-inline">
+                  {{ csrf_token() if csrf_token is defined else '' }}
+                  <button class="btn btn-outline-danger btn-sm"
+                          {% if e.status == 'Cancelled' %}disabled{% endif %}>
+                    Cancel
+                  </button>
+                </form>
+              </div>
+            </div>
+          </article>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info mt-3">You haven’t created any events yet.</div>
+  {% endif %}
+</div>
+{% endblock %}
