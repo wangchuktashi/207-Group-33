@@ -112,22 +112,22 @@
 
       <!-- display comments -->
       <ul class="list-group mb-3">
-  {% if comments and comments|length > 0 %}
-    {% for c in comments %}
-      <li class="list-group-item d-flex flex-column">
-        <div class="small text-muted">
-          <strong>
-            {{ (c.user.first_name ~ ' ' ~ c.user.surname) if c.user else 'Anon' }}
-          </strong>
-          · {{ c.created_at }}
-        </div>
-        <div>{{ c.text }}</div>
-      </li>
-    {% endfor %}
-  {% else %}
-    <li class="list-group-item text-muted">No comments yet</li>
-  {% endif %}
-</ul>
+      {% if comments and comments|length > 0 %}
+        {% for c in comments %}
+          <li class="list-group-item d-flex flex-column">
+            <div class="small text-muted">
+              <strong>
+                {{ (c.user.first_name ~ ' ' ~ c.user.surname) if c.user else 'Anon' }}
+              </strong>
+              · {{ c.created_at }}
+            </div>
+            <div>{{ c.text }}</div>
+          </li>
+        {% endfor %}
+      {% else %}
+        <li class="list-group-item text-muted">No comments yet</li>
+      {% endif %}
+    </ul>
 
       <!-- add new comment -->
       <form method="POST" action="{{ url_for('main.add_comment', event_id=event.id) }}">
