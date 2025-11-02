@@ -2,7 +2,11 @@
 {% block title %}Not Found{% endblock %}
 {% block body %}
 <div class="container py-5">
-  <h1 class="display-5">404 — Not Found</h1>
-  <p class="lead">The page you requested couldn't be found. Check the URL or return to the <a href="{{ url_for('main.index') }}">home page</a>.</p>
+  <div class="errorpage">
+    <h1 class="display-5">404 — Page Not Found</h1>
+    <img src="/static/img/error-404.gif" alt="error-404-gif" width="480" height="480" />
+    <p class="lead">Looks like your shot at the page got totally rejected.</p>
+    <p class="lead">Double check the URL or return to the <a href="{{ url_for('main.index') }}">home page</a>.</p>
+  </div>
 </div>
 {% endblock %}
