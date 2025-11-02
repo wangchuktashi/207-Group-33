@@ -16,7 +16,25 @@ body {
   border-color: #02C39A;
 }
 
+/* 404 error page */
+.errorpage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: enter;
+  gap: 1rem;
+  min-height: 60vh;    /* centers vertically */
+  max-width: 800px;
+  margin: 0 auto;      /* centers horizontally */
+  padding: 2rem 1rem;
+}
 
+.errorpage img { 
+  max-width: 100%; 
+  height: auto; 
+  display: block; 
+}
 
 /* === Event card container === */
 .card {
