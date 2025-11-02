@@ -15,7 +15,7 @@ def create_app():
     db.init_app(app)
     Bootstrap5(app)
 
-# --- Flask-Login ---
+# Flask-Login 
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"   # redirect here if not logged in
     login_manager.init_app(app)
@@ -25,7 +25,7 @@ def create_app():
     def load_user(user_id: str):
         return db.session.scalar(db.select(User).where(User.id == int(user_id)))
 
-    # --- Blueprints ---
+    # Blueprints 
     from . import views
     app.register_blueprint(views.main_bp)
 
@@ -33,7 +33,9 @@ def create_app():
     app.register_blueprint(auth.auth_bp)
 
 
-    # --- Error Handling ---
+
+
+    # Error Handling
     @app.errorhandler(404)
     def not_found_error(error):
         return render_template('404.html'), 404
