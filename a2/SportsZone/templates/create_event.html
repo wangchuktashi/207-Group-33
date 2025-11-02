@@ -3,7 +3,7 @@
 
 {% block body %}
 
-{# ------- tiny helper macros for rendering with errors ------- #}
+<!--macro to render a field with errors and optional help text -->
 {% macro field_row(field, type='text', placeholder='', rows=None, help_text=None, extra_class='') -%}
   {% set invalid = ' is-invalid' if field.errors else '' %}
   <div class="mb-3">
@@ -38,7 +38,7 @@
       {% endif %}
     </div>
 
-    {# show flashed messages if any #}
+    <!-- Flash messages -->
     {% with msgs = get_flashed_messages(with_categories=true) %}
       {% if msgs %}
         <div class="mb-3">
@@ -49,13 +49,12 @@
       {% endif %}
     {% endwith %}
 
+    <!-- Main create/edit form -->
     <div class="form-section">
-      <form method="POST" enctype="multipart/form-data"
-            onsubmit="this.querySelector('button[type=submit]')?.setAttribute('disabled','disabled')">
+      <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
 
         {{ field_row(form.event_title, placeholder="e.g. Real Madrid vs Barcelona") }}
-
         {{ field_row(form.sport_type) }}
 
         <div class="row">
@@ -87,7 +86,7 @@
           </div>
         </div>
 
-        {# show current image (only when editing and we have one) #}
+        <!-- Existing image preview (edit mode only) -->
         {% if event and event.event_image %}
           <div class="mb-3">
             <label class="form-label d-block">Current Image</label>
@@ -99,25 +98,25 @@
         {% endif %}
 
         {{ field_row(form.image, help_text="Upload a high-quality image (JPG/PNG).") }}
-
         {{ field_row(form.description, rows=5, placeholder="Write a short description…") }}
 
         <div class="d-flex flex-wrap gap-2 align-items-center">
           {{ form.submit(class="btn btn-primary", value=('Save Changes' if event else 'Create Event')) }}
           {{ form.reset(class="btn btn-outline-secondary") }}
           <a href="{{ url_for('main.my_events') if event else url_for('main.index') }}" class="btn btn-link">Cancel</a>
-
-          {# Cancel Event action (only visible in edit mode) #}
-          {% if event %}
-            <form method="POST" action="{{ url_for('main.cancel_event', event_id=event.id) }}"
-                  onsubmit="return confirm('Cancel this event? This will stop further bookings.');" class="ms-auto">
-              <button class="btn btn-outline-danger" {% if event.status == 'Cancelled' %}disabled{% endif %}>
-                Cancel Event
-              </button>
-            </form>
-          {% endif %}
         </div>
       </form>
+
+      <!-- Separate cancel-event POST form (kept OUTSIDE main form to avoid nested forms) -->
+      {% if event %}
+        <form method="POST" action="{{ url_for('main.cancel_event', event_id=event.id) }}"
+              class="mt-2"
+              onsubmit="return confirm('Cancel this event? This will stop further bookings.');">
+          <button class="btn btn-outline-danger" {% if event.status == 'Cancelled' %}disabled{% endif %}>
+            Cancel Event
+          </button>
+        </form>
+      {% endif %}
     </div>
   </div>
 </div>

@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% block title %}{{ heading }} · SportsZone{% endblock %}
 
-
 {% block body %}
+
 <div class="auth-page py-4">
   <div class="auth-card bg-white p-4 p-md-5">
+    <!-- Header: brand + context + quick switch -->
     <div class="d-flex justify-content-between align-items-start mb-3">
       <div>
         <div class="brand-lockup">
-          <img src="{{ url_for('static', filename='img/logoweb.png') }}" alt="SportsZone">
+          <img src="{{ url_for('static', filename='img/logoweb.png') }}" alt="SportsZone logo">
           <strong>SportsZone</strong>
         </div>
         <h1 class="h4 mt-3 mb-1">{{ heading }}</h1>
@@ -20,6 +21,8 @@
           {% endif %}
         </p>
       </div>
+
+      <!-- Link to switch between Login/Register -->
       {% if heading == 'Login' %}
         <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('auth.register') }}">Register</a>
       {% else %}
@@ -27,60 +30,54 @@
       {% endif %}
     </div>
 
+    <!-- Auth form -->
     <form method="POST" novalidate>
       {{ form.hidden_tag() }}
 
-      {# Helper to render a field with label + errors #}
+      <!-- Small helper to render label + control + inline errors -->
       {% macro field_row(field, type='text', placeholder='') -%}
         <div class="mb-3">
-          <label class="form-label">{{ field.label.text }}</label>
-          {{ field(class="form-control" + (' is-invalid' if field.errors else ''), type=type, placeholder=placeholder) }}
+          <label class="form-label" for="{{ field.id }}">{{ field.label.text }}</label>
+          {{ field(
+              class="form-control" + (' is-invalid' if field.errors else ''),
+              id=field.id,
+              type=type,
+              placeholder=placeholder
+          ) }}
           {% for e in field.errors %}
             <div class="invalid-feedback">{{ e }}</div>
           {% endfor %}
         </div>
       {%- endmacro %}
 
-      {# The register form has these fields; login has only email_id + password #}
+      <!-- Register-only fields -->
       {% if form.first_name is defined %}
         {{ field_row(form.first_name, placeholder="Jane") }}
       {% endif %}
       {% if form.surname is defined %}
         {{ field_row(form.surname, placeholder="Doe") }}
       {% endif %}
-
-      {% if form.email_id is defined %}
-        {{ field_row(form.email_id, type='email', placeholder="you@example.com") }}
-      {% endif %}
-
       {% if form.mobile_number is defined %}
         {{ field_row(form.mobile_number, placeholder="e.g., 0412 345 678") }}
       {% endif %}
-
       {% if form.street_address is defined %}
         {{ field_row(form.street_address, placeholder="123 Sample St, Brisbane") }}
       {% endif %}
 
+      <!-- Shared fields -->
+      {% if form.email_id is defined %}
+        {{ field_row(form.email_id, type='email', placeholder="you@example.com") }}
+      {% endif %}
+
       {% if form.password is defined %}
-        <div class="mb-3">
-          <label class="form-label">{{ form.password.label.text }}</label>
-          <div class="input-group">
-            {{ form.password(class="form-control" + (' is-invalid' if form.password.errors else ''), id="pwd-field") }}
-            <button class="btn btn-outline-secondary" type="button" id="togglePwd" aria-label="Show password">Show</button>
-            {% for e in form.password.errors %}
-              <div class="invalid-feedback d-block">{{ e }}</div>
-            {% endfor %}
-          </div>
-          {% if heading != 'Login' %}
-            <div class="form-help mt-1">Use at least 6 characters.</div>
-          {% endif %}
-        </div>
+        {{ field_row(form.password, type='password', placeholder=("At least 6 characters" if heading != 'Login' else "Your password")) }}
       {% endif %}
 
       {% if form.confirm is defined %}
         {{ field_row(form.confirm, type='password', placeholder="Re-enter password") }}
       {% endif %}
 
+      <!-- Primary submit -->
       <div class="d-grid">
         {% if form.submit is defined %}
           {{ form.submit(class="btn btn-primary py-2") }}
@@ -89,6 +86,7 @@
         {% endif %}
       </div>
 
+      <!-- Secondary prompt -->
       {% if heading == 'Login' %}
         <div class="text-center mt-3">
           <span class="text-muted">New user?</span>
