@@ -1,12 +1,14 @@
-/* === Global / Shared Styles === */
+/* Global */
 
-.navbar {
-  background-color: #004643;
-}
 body {
   background-color: #E8F3F1;
   color: #0F2F28;
 }
+
+.navbar {
+  background-color: #004643;
+}
+
 .btn-primary {
   background-color: #00A896;
   border-color: #00A896;
@@ -16,23 +18,60 @@ body {
   border-color: #02C39A;
 }
 
-/* 404 error page */
+/* Improve focus ring for inputs/selects */
+.form-control:focus,
+.form-select:focus {
+  box-shadow: 0 0 0 .2rem rgba(13,110,253,.15);
+}
+
+/* 404 PAGE */
+
 .errorpage {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: enter;
+  text-align: center;
   gap: 1rem;
-  min-height: 60vh;    /* centers vertically*/
+  min-height: 60vh;
   max-width: 800px;
-  margin: 0 auto;      /* centers horizontally */
+  margin: 0 auto;
   padding: 2rem 1rem;
 }
+.errorpage img { max-width: 100%; height: auto; display: block; }
 
-.errorpage img{ max-width: 100%; height: auto; display: block; }
+/*  TOOLBAR (Filters + Search) */
 
-/* === Event card container === */
+.toolbar {
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(0,0,0,.05);
+}
+
+.cat-btn {
+  color: #134e4a;
+  background: #e6f7f3;
+  border: 1px solid #cceee7;
+  border-radius: 20px;
+  padding: .35rem .9rem;
+  font-weight: 500;
+  transition: all .2s ease-in-out;
+}
+.cat-btn:hover { background: #cceee7; border-color: #99ddd1; }
+.cat-btn.active { background: #134e4a; color: #fff; border-color: #134e4a; }
+
+.search-box { border-radius: 20px 0 0 20px; }
+
+/* Responsive: stack toolbar on small screens */
+@media (max-width:576px){
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar form { width: 100%; margin-left: 0 !important; }
+}
+
+/* GENERIC CARDS (Home grid)  */
+
 .card {
   border: 0;
   border-radius: 16px;
@@ -40,14 +79,12 @@ body {
   box-shadow: 0 10px 24px rgba(0,0,0,.08);
   background: #fff;
 
-  /* make all cards consistent height */
   display: flex;
   flex-direction: column;
-  height: 540px;              /* <- tune this number if needed */
-  max-width: 400px;           /* optional: keeps nice column width */
+  height: 540px;       
+  max-width: 400px;  
 }
 
-/* nice hover accent without layout shift */
 .card:hover {
   border: 2px solid #134e4a;
   box-shadow: 0 16px 32px rgba(0,0,0,.18);
@@ -55,340 +92,266 @@ body {
   transition: all .2s ease;
 }
 
-/* === Card media (poster image) === */
 .card-media {
-  /* instead of aspect-ratio, lock a fixed pixel height so
-     every poster is the same size no matter the source image */
   height: 320px;
   width: 100%;
-  background:#000;
-  overflow:hidden;
+  background: #000;
+  overflow: hidden;
   flex-shrink: 0;
 }
-
-/* poster image itself */
 .card-media > img {
   width: 100%;
   height: 100%;
-  object-fit: cover;          /* fill box, crop edges if needed */
+  object-fit: cover;
   object-position: center;
   display: block;
-  padding: 0;                 /* remove padding so edges are flush */
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
 }
 
-/* === Card body content under the image === */
 .card-body {
-  /* make the bottom button line up across cards */
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: 1rem 1rem 1rem;
+  padding: 1rem;
 }
-
-/* force the "View Details" button to sit at the bottom */
 .card-body .btn {
   margin-top: auto;
   font-weight: 500;
   border-radius: 8px;
 }
 
-/* Toolbar (categories, search, status) */
-.toolbar{
-  background:#ffffff;
-  display:flex;
-  align-items:center;
-  gap:1rem;
-  border:1px solid rgba(0,0,0,.05);
+/* HERO CAROUSEL (Home) */
+
+.hero {
+  height: 420px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(0,0,0,.18);
+}
+.hero .item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(.9);
+}
+.hero .carousel-caption {
+  bottom: 22px;
+  text-shadow: 0 6px 16px rgba(0,0,0,.6);
+}
+.hero .carousel-indicators [data-bs-target]{
+  width: 24px; height: 5px; border-radius: 999px;
+  background: rgba(255,255,255,.6); border: 0;
+}
+.hero .carousel-indicators .active{ background: #fff; }
+
+/* EVENT PAGE (event.html) */
+
+/* Hero banner */
+.event-hero{
+  position: relative;
+  width: 100%;
+  max-height: 500px;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  margin-top: 10px;
+}
+.hero-banner{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(.88);
+  transition: transform .5s ease;
+}
+.event-hero:hover .hero-banner{ transform: scale(1.05); }
+.hero-overlay{
+  position: absolute;
+  bottom: 20px; left: 20px; color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,.7);
+}
+.hero-title{ font-size: 2rem; font-weight: 700; margin: 0; }
+.hero-subtitle{ font-size: 1rem; margin: .25rem 0 0; }
+
+/* Action strip */
+.event-actions{
+  display: flex; justify-content: space-between; align-items: center;
+  gap: .75rem; margin: .75rem 0 1rem;
+}
+.low-inventory{
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: #ffefed; border: 1px solid #ffd9d4; color: #0f172a;
+  border-radius: 14px; padding: .35rem .6rem; font-weight: 700;
+}
+.icon-btn{
+  --btn-color: #3b5bff;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; border-radius: 10px;
+  border: 1px solid #dfe6ff; background: #f4f7ff; color: var(--btn-color);
+  text-decoration: none; cursor: pointer;
+}
+.icon-btn:hover{ background: #eef3ff; border-color: #cfd9ff; }
+.icon-btn svg{ width: 20px; height: 20px; display: block; }
+
+/* Definition list for meta */
+.info-list{ margin: 0; padding: 0; }
+.info-list dt{
+  width: 130px; float: left; clear: left;
+  font-weight: 600; color: #0f2f28; padding: .45rem 0;
+}
+.info-list dd{
+  margin-left: 140px; padding: .45rem 0; color: #111827;
 }
 
-/* Category buttons */
-.cat-btn{
-  color:#134e4a;
-  background:#e6f7f3;
-  border:1px solid #cceee7;
-  border-radius:20px;
-  padding:0.35rem 0.9rem;
-  font-weight:500;
-  transition:all 0.2s ease-in-out;
+/* Booking panel (sticky on desktop) */
+@media (min-width:992px){ .sticky-side{ position: sticky; top: 1rem; } }
+.booking-card{
+  background: #fff; border: 1px solid rgba(0,0,0,.06);
+  border-radius: 16px; box-shadow: 0 16px 32px rgba(0,0,0,.12);
+  padding: 1.25rem;
 }
-.cat-btn:hover{ background:#cceee7; border-color:#99ddd1; }
-.cat-btn.active{ background:#134e4a; color:#fff; border-color:#134e4a; }
+.booking-card h3{ font-size: 1.05rem; font-weight: 700; margin: 0 0 .75rem; }
+.booking-meta{ font-size: .92rem; color: #6b7280; margin-bottom: .75rem; }
 
-/* Search box */
-.search-box{ border-radius:20px 0 0 20px; }
+/* SHARE MODAL  */
 
-/* Responsive tweaks shared */
-@media (max-width:576px){
-  .toolbar{ flex-direction:column; align-items:stretch; }
-  .toolbar form{ width:100%; margin-left:0 !important; }
-}
-
-
-/* === Share Modal (CSS-only via :target) === */
 .share-modal{
-  position:fixed; inset:0; display:none;
-  background:rgba(0,0,0,.45);
-  z-index:1050; /* above page content */
+  position: fixed; inset: 0; display: none;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,.35); z-index: 1060; padding: 1rem;
 }
-.share-modal:target{ display:flex; align-items:center; justify-content:center; }
+.share-modal:target{ display: flex; }
 
 .share-dialog{
-  width:min(680px, 92vw);
-  background:#fff;
-  border-radius:14px;
-  box-shadow:0 24px 48px rgba(0,0,0,.25);
-  padding:22px 22px 18px;
-  position:relative;
+  width: 100%; max-width: 640px; background: #fff; border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.25); padding: 1.25rem 1.25rem 1rem;
+  position: relative;
 }
-
 .share-close{
-  position:absolute; top:10px; right:12px;
-  font-size:28px; line-height:1; text-decoration:none; color:#6b7280;
+  position: absolute; right: 1.25rem; top: 1rem; color: #94a3b8;
+  text-decoration: none; font-size: 2rem; line-height: 1;
 }
-.share-close:hover{ color:#111827; }
+.share-title{ font-size: 1.15rem; font-weight: 700; margin: 0 0 .75rem; color: #0f2f28; }
 
-.share-title{
-  margin:6px 0 14px; text-align:center;
-  font-weight:700; color:#111827;
-}
-
-.share-icons{
-  display:flex; gap:18px; justify-content:center; align-items:center;
-  margin:10px 0 20px;
-}
-
+.share-icons{ display: flex; gap: .75rem; align-items: center; margin: .5rem 0 1rem; }
 .share-circle{
-  width:56px; height:56px; border-radius:50%;
-  display:inline-flex; align-items:center; justify-content:center;
-  background:#f3f4f6; color:#363b5a; text-decoration:none;
-  font-weight:800; font-size:22px;
-  transition:transform .18s ease, background .18s ease;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid #e5e7eb; background: #f8fafc; color: #334155; text-decoration: none; font-weight: 800;
 }
-.share-circle:hover{ background:#e9ecf6; transform:translateY(-2px); }
+.share-circle:hover{ background: #eef2ff; border-color: #dbeafe; color: #1e40af; }
 
-.share-label{ display:block; font-size:.92rem; color:#4b5563; margin:4px 0 8px; }
-
-.share-url{
-  display:flex; align-items:center; gap:8px;
-  border:1px solid #d1d5db; border-radius:8px; padding:8px 10px;
-}
-.share-url input{
-  border:0; outline:0; flex:1; font-size:.95rem; color:#111827;
-}
+.share-url{ display: flex; gap: .5rem; align-items: stretch; }
+.share-url input{ flex: 1; border: 1px solid #e5e7eb; border-radius: 10px; padding: .65rem .75rem; }
 .share-open{
-  display:inline-flex; align-items:center; justify-content:center;
-  width:28px; height:28px; color:#3b5bff; text-decoration:none;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; border: 1px solid #e5e7eb; border-radius: 10px;
 }
-.share-open svg{ width:20px; height:20px; display:block; }
+.share-open svg{ width: 20px; height: 20px; }
 
+/* BOOKINGS PAGE (booking.html) */
 
-/* --- Hero --- */
-  .event-hero{
-    position:relative;width:100%;max-height:500px;overflow:hidden;
-    border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);margin-top:10px;
-  }
-  .hero-banner{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.88);transition:transform .5s ease;}
-  .event-hero:hover .hero-banner{transform:scale(1.05);}
-  .hero-overlay{position:absolute;bottom:20px;left:20px;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.7);}
-  .hero-title{font-size:2rem;font-weight:700;margin:0;}
-  .hero-subtitle{font-size:1rem;margin-top:.25rem;margin-bottom:0;}
+.bookings-page { padding-top: .75rem; }
+.bookings-page .page-title{
+  font-weight: 800; color: #004a46; margin-bottom: 1rem;
+}
+.bookings-page .booking-card{
+  border: 1px solid rgba(0,0,0,.05); border-radius: 16px; overflow: hidden;
+  background: #ffffff; box-shadow: 0 6px 16px rgba(0,0,0,.06);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.bookings-page .booking-card:hover{
+  transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,.12);
+}
+.bookings-page .thumb-wrap{ position: relative; min-height: 180px; background: #eaf7f5; }
+.bookings-page .thumb{
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.bookings-page .body{
+  padding: 1rem 1.25rem 1.25rem; display: flex; flex-direction: column; height: 100%;
+}
+.bookings-page .title{ font-size: 1.15rem; font-weight: 800; margin: 0; color: #0f2f28; }
+.bookings-page .meta{ margin-top: .35rem; color: #6b7280; font-size: .92rem; }
+.bookings-page .meta b{ color: #0f2f28; }
+.bookings-page .spacer{ flex: 1 1 auto; }
+.bookings-page .actions .btn{ border-radius: 12px; font-weight: 600; }
+.bookings-page .btn-primary{ background: #00bfa6; border: none; }
+.bookings-page .btn-primary:hover{ background: #009e8a; }
+.bookings-page .sport-badge{
+  margin-left: .5rem; font-weight: 700; text-transform: lowercase;
+}
+.bookings-page .thumb-fallback{
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-weight: 800; font-size: 2.2rem; color: #0f2f28;
+  background: linear-gradient(135deg, #c7f7ef, #a8efe6);
+}
+@media (max-width: 767px){
+  .bookings-page .thumb-wrap{ min-height: 160px; }
+  .bookings-page .body{ padding: .9rem 1rem 1rem; }
+}
 
-  /* --- Section polish --- */
-  .section-title{
-    display:flex;align-items:center;gap:.75rem;margin:1.5rem 0 .75rem;
-    font-weight:700;color:#0f2f28;
-  }
-  .section-title::after{content:"";height:1px;flex:1;background:rgba(0,0,0,.08);}
+/* CREATE / EDIT EVENT (create_event.html) */
 
-  .info-list{margin:0;padding:0}
-  .info-list dt{width:130px;float:left;clear:left;font-weight:600;color:#0f2f28;padding:.45rem 0;}
-  .info-list dd{margin-left:140px;padding:.45rem 0;color:#111827;}
+.create-event-page { background-color: #eafaf5; }
+.create-event-page .content-wrap { max-width: 800px; margin: 0 auto; }
+.create-event-page .form-section{
+  background: #fff; border-radius: 20px; padding: 40px 45px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.08); transition: .3s;
+}
+.create-event-page .form-section:hover{ box-shadow: 0 16px 35px rgba(0,0,0,.1); }
+.create-event-page h1{ font-weight: 800; color: #004d40; }
+.create-event-page label{ font-weight: 600; color: #004d40; margin-bottom: 6px; }
+.create-event-page .help-text{ color: #6b7280; font-size: .9rem; }
+.current-image{ border-radius: 14px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,.1); }
 
-  .empty-state{background:#fff;border:1px dashed #cceee0;color:#0f2f28;padding:.85rem 1rem;border-radius:10px;}
-  .comment-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:1rem;box-shadow:0 8px 20px rgba(0,0,0,.08);}
+/* AUTH PAGES (Login / Register) */
 
-  /* Booking panel */
-  @media (min-width:992px){ .sticky-side{position:sticky;top:1rem;} }
-  .booking-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 16px 32px rgba(0,0,0,.12);padding:1.25rem;}
-  .booking-card h3{font-size:1.05rem;font-weight:700;margin:0 0 .75rem;}
-  .booking-meta{font-size:.92rem;color:#6b7280;margin-bottom:.75rem;}
-  .booking-card .form-label{font-weight:600;color:#0f2f28;}
-  .booking-card .btn-primary{padding:.65rem 1rem;font-weight:600;border-radius:10px;}
-  .form-control:focus,.form-select:focus{box-shadow:0 0 0 .2rem rgba(13,110,253,.15);}
+.auth-page{
+  min-height: 70vh; display: grid; place-items: center; background: #eaf7f5;
+}
+.auth-card{
+  max-width: 520px; width: 100%;
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 18px; box-shadow: 0 12px 30px rgba(0,0,0,.10);
+}
+.brand-lockup{ display: flex; align-items: center; gap: .6rem; }
+.brand-lockup img{ width: 36px; height: 22px; }
+.form-help{ font-size: .9rem; color: #6b7280; }
+.is-invalid + .invalid-feedback{ display: block; }
 
-  @media (max-width: 991px){
-    .info-list dt{width:110px}
-    .info-list dd{margin-left:120px}
-  }
+/* MY EVENTS (my_events.html) */
 
-  /* --- Action strip (low inventory + share) --- */
-  .event-actions{display:flex;justify-content:space-between;align-items:center;gap:.75rem;margin:.75rem 0 1rem;}
-  .low-inventory{display:inline-flex;align-items:center;gap:.5rem;background:#ffefed;border:1px solid #ffd9d4;color:#0f172a;border-radius:14px;padding:.35rem .6rem;font-weight:700;}
-  .low-inventory .flame{font-size:1rem;line-height:1;}
-  .icon-btn{--btn-color:#3b5bff;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;border:1px solid #dfe6ff;background:#f4f7ff;color:var(--btn-color);text-decoration:none;cursor:pointer}
-  .icon-btn:hover{background:#eef3ff;border-color:#cfd9ff}
-  .icon-btn svg{width:20px;height:20px;display:block}
+.my-events-page { padding-top: .75rem; background: #eaf7f5; }
+.my-events-page .page-title { font-weight: 800; color: #004a46; margin-bottom: 1rem; }
 
-  /* --- CSS-only Share Modal (via :target) --- */
-  .share-modal{
-    position:fixed;inset:0;display:none;align-items:center;justify-content:center;
-    background:rgba(0,0,0,.35);z-index:1060;padding:1rem;
-  }
-  .share-modal:target{display:flex;}
-  .share-dialog{
-    width:100%;max-width:640px;background:#fff;border-radius:16px;
-    box-shadow:0 24px 64px rgba(0,0,0,.25);padding:1.25rem 1.25rem 1rem;
-  }
-  .share-close{
-    position:absolute;right:1.25rem;top:1rem;color:#94a3b8;text-decoration:none;
-    font-size:2rem;line-height:1;
-  }
-  .share-title{font-size:1.15rem;font-weight:700;margin:0 0 .75rem;color:#0f2f28;}
-  .share-icons{display:flex;gap:.75rem;align-items:center;margin:.5rem 0 1rem;}
-  .share-circle{
-    width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
-    border:1px solid #e5e7eb;background:#f8fafc;color:#334155;text-decoration:none;font-weight:800;
-  }
-  .share-circle:hover{background:#eef2ff;border-color:#dbeafe;color:#1e40af;}
-  .share-label{display:block;margin:.25rem 0 .25rem;font-size:.85rem;color:#64748b;}
-  .share-url{display:flex;gap:.5rem;align-items:stretch}
-  .share-url input{flex:1;border:1px solid #e5e7eb;border-radius:10px;padding:.65rem .75rem}
-  .share-open{display:inline-flex;align-items:center;justify-content:center;width:42px;border:1px solid #e5e7eb;border-radius:10px}
-  .share-open svg{width:20px;height:20px}
+.my-events-page .event-card{
+  border: 1px solid rgba(0,0,0,.05);
+  border-radius: 16px; overflow: hidden; background: #fff;
+  box-shadow: 0 6px 16px rgba(0,0,0,.06);
+  transition: transform .18s ease, box-shadow .18s ease; height: 100%;
+  display: flex; flex-direction: column;
+}
+.my-events-page .event-card:hover{
+  transform: translateY(-3px); box-shadow: 0 12px 28px rgba(0,0,0,.12);
+}
+.my-events-page .thumb-wrap{ position: relative; min-height: 200px; background: #eaf7f5; }
+.my-events-page .thumb{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
-  /* ===== HERO CAROUSEL ===== */
-  .hero {height: 420px; border-radius: 14px; overflow: hidden; box-shadow: 0 16px 36px rgba(0,0,0,.18);}
-  .hero .item-img {width: 100%; height: 100%; object-fit: cover; filter: brightness(.9);}
-  .hero .carousel-caption {bottom: 22px; text-shadow: 0 6px 16px rgba(0,0,0,.6);}
-  .hero .carousel-indicators [data-bs-target]{width:24px;height:5px;border-radius:999px;background:rgba(255,255,255,.6);border:0}
-  .hero .carousel-indicators .active{background:#fff}
+.my-events-page .body{ padding: 1rem 1.25rem .5rem; }
+.my-events-page .title{ font-size: 1.15rem; font-weight: 800; margin: 0; color: #0f2f28; }
+.my-events-page .meta{ margin-top: .35rem; color: #6b7280; font-size: .92rem; }
+.my-events-page .badge{ font-weight: 700; }
 
-   /* ===== scope everything to this page ===== */
-  .bookings-page { padding-top: .75rem; }
+.my-events-page .card-footer{
+  background: transparent; border-top: 0; padding: 0 1.25rem 1.1rem; margin-top: auto;
+}
+.my-events-page .actions .btn{ border-radius: 12px; font-weight: 600; }
+.my-events-page .btn-primary{ background: #00bfa6; border: none; }
+.my-events-page .btn-primary:hover{ background: #009e8a; }
 
-  .bookings-page .page-title{
-    font-weight: 800; color: #004a46; margin-bottom: 1rem;
-  }
-
-  /* grid cards */
-  .bookings-page .booking-card{
-    border: 1px solid rgba(0,0,0,.05);
-    border-radius: 16px;
-    overflow: hidden;
-    background: #ffffff;
-    box-shadow: 0 6px 16px rgba(0,0,0,.06);
-    transition: transform .18s ease, box-shadow .18s ease;
-  }
-  .bookings-page .booking-card:hover{
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(0,0,0,.12);
-  }
-
-  /* left thumb */
-  .bookings-page .thumb-wrap{
-    position: relative; min-height: 180px; background: #eaf7f5;
-  }
-  .bookings-page .thumb{
-    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  }
-
-  /* right body */
-  .bookings-page .body{
-    padding: 1rem 1.25rem 1.25rem;
-    display: flex; flex-direction: column; height: 100%;
-  }
-  .bookings-page .title{
-    font-size: 1.15rem; font-weight: 800; margin: 0; color: #0f2f28;
-  }
-  .bookings-page .meta{
-    margin-top: .35rem; color: #6b7280; font-size: .92rem;
-  }
-  .bookings-page .meta b{ color:#0f2f28; }
-  .bookings-page .spacer{ flex: 1 1 auto; }
-  .bookings-page .actions .btn{
-    border-radius: 12px; font-weight: 600;
-  }
-  .bookings-page .btn-primary{
-    background:#00bfa6; border:none;
-  }
-  .bookings-page .btn-primary:hover{ background:#009e8a; }
-
-  /* sport badge */
-  .bookings-page .sport-badge{
-    margin-left:.5rem; font-weight:700;
-    text-transform: lowercase;
-  }
-
-  /* fallback thumbnail (first letter) */
-  .bookings-page .thumb-fallback{
-    position:absolute; inset:0; display:grid; place-items:center;
-    font-weight:800; font-size:2.2rem; color:#0f2f28;
-    background: linear-gradient(135deg, #c7f7ef, #a8efe6);
-  }
-
-  /* responsive tweaks */
-  @media (max-width: 767px){
-    .bookings-page .thumb-wrap{ min-height: 160px; }
-    .bookings-page .body{ padding: .9rem 1rem 1rem; }
-  }
-
-
-
-  .create-event-page { background-color: #eafaf5; }
-  .create-event-page .form-section{
-    background:#fff;border-radius:20px;padding:40px 45px;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);transition:.3s;
-  }
-  .create-event-page .form-section:hover{box-shadow:0 16px 35px rgba(0,0,0,.1);}
-  .create-event-page h1{font-weight:800;color:#004d40;}
-  .create-event-page label{font-weight:600;color:#004d40;margin-bottom:6px;}
-  .create-event-page .help-text{color:#6b7280;font-size:.9rem;}
-  @media (min-width: 992px){ .create-event-page .content-wrap { max-width: 800px; margin: 0 auto; } }
-
-  /* optional image preview (edit mode) */
-  .current-image{border-radius:14px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,.1);}
-
-  .auth-page{min-height:70vh;display:grid;place-items:center;background:#eaf7f5;}
-  .auth-card{max-width:520px;width:100%;border:1px solid rgba(0,0,0,.06);
-             border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.10);}
-  .brand-lockup{display:flex;align-items:center;gap:.6rem}
-  .brand-lockup img{width:36px;height:22px}
-  .form-help{font-size:.9rem;color:#6b7280}
-  .is-invalid + .invalid-feedback{display:block}
-
-  
-  
-.my-events-page { padding-top: .75rem; background:#eaf7f5; }
-  .my-events-page .page-title { font-weight: 800; color: #004a46; margin-bottom: 1rem; }
-
-  .event-card{
-    border:1px solid rgba(0,0,0,.05);
-    border-radius:16px; overflow:hidden; background:#fff;
-    box-shadow:0 6px 16px rgba(0,0,0,.06);
-    transition:transform .18s ease, box-shadow .18s ease; height:100%;
-    display:flex; flex-direction:column;
-  }
-  .event-card:hover{ transform:translateY(-3px); box-shadow:0 12px 28px rgba(0,0,0,.12); }
-
-  .thumb-wrap{ position:relative; min-height:200px; background:#eaf7f5; }
-  .thumb{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-
-  .body{ padding:1rem 1.25rem 0.5rem; }
-  .title{ font-size:1.15rem; font-weight:800; margin:0; color:#0f2f28; }
-  .meta{ margin-top:.35rem; color:#6b7280; font-size:.92rem; }
-  .badge{ font-weight:700; }
-
-  .card-footer{ background:transparent; border-top:0; padding:0 1.25rem 1.1rem; margin-top:auto; }
-  .actions .btn{ border-radius:12px; font-weight:600; }
-  .btn-primary{ background:#00bfa6; border:none; }
-  .btn-primary:hover{ background:#009e8a; }
-
-  @media (max-width:767px){
-    .thumb-wrap{ min-height:160px; }
-    .body{ padding:.9rem 1rem .25rem; }
-    .card-footer{ padding:0 1rem 1rem; }
-  }
-
-  .hero-img{width:100%;height:65vh;object-fit:cover;object-position:top;}
+@media (max-width:767px){
+  .my-events-page .thumb-wrap{ min-height: 160px; }
+  .my-events-page .body{ padding: .9rem 1rem .25rem; }
+  .my-events-page .card-footer{ padding: 0 1rem 1rem; }
+}

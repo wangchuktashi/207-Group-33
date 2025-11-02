@@ -1,39 +1,9 @@
 {% extends "base.html" %}
 {% block title %}{{ event.event_title }} · SportsZone{% endblock %}
 
-{% block extra_css %}
-<style>
-  .event-hero{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.18);margin-top:.5rem}
-  .hero-banner{width:100%;height:44vh;object-fit:cover;filter:brightness(.9)}
-  .hero-overlay{position:absolute;left:16px;bottom:16px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.7)}
-  .hero-title{margin:0;font-weight:700}
-  .hero-subtitle{margin:2px 0 0}
-  .event-actions{display:flex;justify-content:space-between;align-items:center;margin:.75rem 0 1rem}
-  .low-inventory{display:inline-flex;gap:.5rem;align-items:center;background:#ffefed;border:1px solid #ffd9d4;border-radius:14px;padding:.35rem .6rem;font-weight:700}
-  .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;border:1px solid #dfe6ff;background:#f4f7ff;color:#3b5bff;text-decoration:none}
-  .icon-btn:hover{background:#eef3ff;border-color:#cfd9ff}
-  .icon-btn svg{width:20px;height:20px}
-  .info-list{margin:0;padding:0}
-  .info-list dt{width:120px;float:left;clear:left;font-weight:600;color:#0f2f28;padding:.4rem 0}
-  .info-list dd{margin-left:130px;padding:.4rem 0;color:#1f2937}
-  @media (max-width: 575px){ .info-list dt{width:100px} .info-list dd{margin-left:110px} }
-  @media (min-width:992px){ .sticky-side{position:sticky;top:1rem} }
-  .booking-card{border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 10px 24px rgba(0,0,0,.1);padding:1.1rem;background:#fff}
-  .share-modal{position:fixed;inset:0;display:none;background:rgba(0,0,0,.5);z-index:1050}
-  .share-modal:target{display:block}
-  .share-dialog{max-width:520px;margin:8vh auto;background:#fff;border-radius:14px;padding:1rem 1.25rem}
-  .share-close{float:right;font-size:1.6rem;line-height:1;text-decoration:none;color:#111}
-  .share-title{margin:.25rem 0 1rem;font-weight:700}
-  .share-icons{display:flex;gap:.5rem;margin-bottom:.75rem}
-  .share-circle{width:40px;height:40px;border-radius:999px;background:#f3f4f6;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#111;text-decoration:none}
-  .share-url{display:flex;gap:.5rem;align-items:center}
-  .share-url input{flex:1}
-  .share-open svg{width:20px;height:20px}
-</style>
-{% endblock %}
 
 {% block body %}
-<!-- Hero -->
+<!-- Hero image + overlay title -->
 <div class="event-hero mb-3">
   <img src="{{ url_for('static', filename='img/' ~ (event.event_image or 'placeholder.jpg')) }}"
        alt="{{ event.event_title }}" class="img-fluid hero-banner">
@@ -43,14 +13,14 @@
   </div>
 </div>
 
-<!-- Action strip -->
+<!-- Action strip (share + “few tickets left”) -->
 <div class="container">
   <div class="event-actions">
     {% set left = (event.total_tickets or 0) - (event.tickets_sold or 0) %}
     {% if event.status == 'Open' and left <= 30 and left > 0 %}
       <span class="low-inventory">🔥 Few tickets left</span>
     {% endif %}
-    <a class="icon-btn" href="#share-modal" title="Share">
+    <a class="icon-btn" href="#share-modal" title="Share" aria-label="Share">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M12 16V7m0 0l-4 4m4-4l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M7 16h10v3a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -59,7 +29,7 @@
   </div>
 </div>
 
-{# Teams from title "A vs B" if you keep that style #}
+<!-- Derive “Home vs Away” from title when applicable -->
 {% set teams = (event.event_title or '') .split(' vs ') %}
 {% if teams|length == 2 %}
   <div class="d-flex justify-content-center align-items-center gap-4 mb-2">
@@ -69,7 +39,7 @@
   </div>
 {% endif %}
 
-<!-- Badges + meta -->
+<!-- Status badges + meta line -->
 {% set badge_map = {'Open':'primary','Sold Out':'danger','Cancelled':'secondary','Inactive':'warning'} %}
 <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
   <span class="badge text-bg-primary">{{ event.sports_type }}</span>
@@ -82,7 +52,7 @@
 </p>
 
 <div class="row g-4">
-  <!-- LEFT -->
+  <!-- LEFT: details + comments -->
   <div class="col-lg-8">
     <h2 class="h5 fw-bold mb-2">About this event</h2>
     {% if event.description %}
@@ -96,7 +66,7 @@
       {% if teams|length == 2 %}<dt>Home / Away</dt><dd>{{ teams[0] }} vs {{ teams[1] }}</dd>{% endif %}
     </dl>
 
-    <!-- Share Modal (CSS-only) -->
+    <!-- Simple CSS-only share modal -->
     <div id="share-modal" class="share-modal" aria-hidden="true">
       <div class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-title">
         <a class="share-close" href="#" aria-label="Close">&times;</a>
@@ -125,36 +95,36 @@
 
     <!-- Comments -->
     <section class="mt-4">
-  <h2 class="h6 mb-3">Comments</h2>
+      <h2 class="h6 mb-3">Comments</h2>
 
-  {% if comments and comments|length %}
-    <ul class="list-group mb-3">
-      {% for c in comments %}
-        <li class="list-group-item d-flex flex-column">
-          <div class="small text-muted">
-            <strong>{{ (c.user.first_name ~ ' ' ~ c.user.surname) if c.user else 'Anon' }}</strong>
-            · {{ c.created_at.strftime('%d-%m-%Y %H:%M') }}
-          </div>
-          <div>{{ c.text }}</div>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <div class="text-muted mb-3">No comments yet</div>
-  {% endif %}
+      {% if comments and comments|length %}
+        <ul class="list-group mb-3">
+          {% for c in comments %}
+            <li class="list-group-item d-flex flex-column">
+              <div class="small text-muted">
+                <strong>{{ (c.user.first_name ~ ' ' ~ c.user.surname) if c.user else 'Anon' }}</strong>
+                · {{ c.created_at.strftime('%d-%m-%Y %H:%M') }}
+              </div>
+              <div>{{ c.text }}</div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="text-muted mb-3">No comments yet</div>
+      {% endif %}
 
-  <form method="POST" action="{{ url_for('main.add_comment', event_id=event.id) }}">
-    {{ comment_form.hidden_tag() }}
-    <div class="mb-3">
-      {{ comment_form.text.label(class="form-label") }}
-      {{ comment_form.text(class="form-control", rows="3", placeholder="Write a comment...") }}
-    </div>
-    {{ comment_form.submit(class="btn btn-primary") }}
-  </form>
-</section>
+      <form method="POST" action="{{ url_for('main.add_comment', event_id=event.id) }}">
+        {{ comment_form.hidden_tag() }}
+        <div class="mb-3">
+          {{ comment_form.text.label(class="form-label") }}
+          {{ comment_form.text(class="form-control", rows="3", placeholder="Write a comment...") }}
+        </div>
+        {{ comment_form.submit(class="btn btn-primary") }}
+      </form>
+    </section>
   </div>
-  
-  <!-- RIGHT -->
+
+  <!-- RIGHT: booking card -->
   <aside class="col-lg-4">
     {% set left = (event.total_tickets or 0) - (event.tickets_sold or 0) %}
     {% set can_book = (event.status == 'Open' and left > 0) %}
@@ -172,6 +142,7 @@
       <form method="POST" action="{{ url_for('main.create_booking') }}">
         {{ booking_form.hidden_tag() }}
         {{ booking_form.event_id() }}
+
         <label class="form-label">{{ booking_form.ticket_type.label }}</label>
         {{ booking_form.ticket_type(class="form-select mb-3", disabled=not can_book) }}
 
@@ -182,8 +153,7 @@
       </form>
 
       <a class="btn btn-outline-secondary w-100" href="{{ url_for('main.booking') }}">View Booking History</a>
-      {# Keep edit link only if you wire an edit view with correct fields #}
-      {# <a href="{{ url_for('main.update_event', event_id=event.id) }}" class="btn btn-outline-primary w-100 mt-2">Edit Event</a> #}
+      <!-- Add an “Edit Event” button here later if you wire an edit view -->
     </div>
   </aside>
 </div>
