@@ -1,20 +1,106 @@
 {% extends "base.html" %}
-{% from "bootstrap5/form.html" import render_form %}
 {% block title %}{{ heading }} · SportsZone{% endblock %}
 
+
 {% block body %}
-<div class="container py-4">
-  <div class="row">
-    <div class="col-md-6">
-      <h4 class="mb-3">{{ heading }}</h4>
-      {{ render_form(form) }}
+<div class="auth-page py-4">
+  <div class="auth-card bg-white p-4 p-md-5">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <div>
+        <div class="brand-lockup">
+          <img src="{{ url_for('static', filename='img/logoweb.png') }}" alt="SportsZone">
+          <strong>SportsZone</strong>
+        </div>
+        <h1 class="h4 mt-3 mb-1">{{ heading }}</h1>
+        <p class="text-muted mb-0">
+          {% if heading == 'Login' %}
+            Welcome back. Please sign in to continue.
+          {% else %}
+            Create your account to start managing events and bookings.
+          {% endif %}
+        </p>
+      </div>
+      {% if heading == 'Login' %}
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('auth.register') }}">Register</a>
+      {% else %}
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('auth.login') }}">Login</a>
+      {% endif %}
     </div>
 
-    {% if heading == 'Login' %}
-    <div class="col-md-4">
-      <p class="mt-3">New user? <a href="{{ url_for('auth.register') }}">Click here</a> to register.</p>
-    </div>
-    {% endif %}
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+
+      {# Helper to render a field with label + errors #}
+      {% macro field_row(field, type='text', placeholder='') -%}
+        <div class="mb-3">
+          <label class="form-label">{{ field.label.text }}</label>
+          {{ field(class="form-control" + (' is-invalid' if field.errors else ''), type=type, placeholder=placeholder) }}
+          {% for e in field.errors %}
+            <div class="invalid-feedback">{{ e }}</div>
+          {% endfor %}
+        </div>
+      {%- endmacro %}
+
+      {# The register form has these fields; login has only email_id + password #}
+      {% if form.first_name is defined %}
+        {{ field_row(form.first_name, placeholder="Jane") }}
+      {% endif %}
+      {% if form.surname is defined %}
+        {{ field_row(form.surname, placeholder="Doe") }}
+      {% endif %}
+
+      {% if form.email_id is defined %}
+        {{ field_row(form.email_id, type='email', placeholder="you@example.com") }}
+      {% endif %}
+
+      {% if form.mobile_number is defined %}
+        {{ field_row(form.mobile_number, placeholder="e.g., 0412 345 678") }}
+      {% endif %}
+
+      {% if form.street_address is defined %}
+        {{ field_row(form.street_address, placeholder="123 Sample St, Brisbane") }}
+      {% endif %}
+
+      {% if form.password is defined %}
+        <div class="mb-3">
+          <label class="form-label">{{ form.password.label.text }}</label>
+          <div class="input-group">
+            {{ form.password(class="form-control" + (' is-invalid' if form.password.errors else ''), id="pwd-field") }}
+            <button class="btn btn-outline-secondary" type="button" id="togglePwd" aria-label="Show password">Show</button>
+            {% for e in form.password.errors %}
+              <div class="invalid-feedback d-block">{{ e }}</div>
+            {% endfor %}
+          </div>
+          {% if heading != 'Login' %}
+            <div class="form-help mt-1">Use at least 6 characters.</div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if form.confirm is defined %}
+        {{ field_row(form.confirm, type='password', placeholder="Re-enter password") }}
+      {% endif %}
+
+      <div class="d-grid">
+        {% if form.submit is defined %}
+          {{ form.submit(class="btn btn-primary py-2") }}
+        {% else %}
+          <button class="btn btn-primary py-2" type="submit">{{ heading }}</button>
+        {% endif %}
+      </div>
+
+      {% if heading == 'Login' %}
+        <div class="text-center mt-3">
+          <span class="text-muted">New user?</span>
+          <a href="{{ url_for('auth.register') }}">Create an account</a>
+        </div>
+      {% else %}
+        <div class="text-center mt-3">
+          <span class="text-muted">Already have an account?</span>
+          <a href="{{ url_for('auth.login') }}">Sign in</a>
+        </div>
+      {% endif %}
+    </form>
   </div>
 </div>
 {% endblock %}

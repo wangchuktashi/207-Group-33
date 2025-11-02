@@ -1,24 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ 'Edit Event' if event else 'Create Event' }} · SportsZone{% endblock %}
 
-{% block extra_css %}
-<style>
-  .create-event-page { background-color: #eafaf5; }
-  .create-event-page .form-section{
-    background:#fff;border-radius:20px;padding:40px 45px;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);transition:.3s;
-  }
-  .create-event-page .form-section:hover{box-shadow:0 16px 35px rgba(0,0,0,.1);}
-  .create-event-page h1{font-weight:800;color:#004d40;}
-  .create-event-page label{font-weight:600;color:#004d40;margin-bottom:6px;}
-  .create-event-page .help-text{color:#6b7280;font-size:.9rem;}
-  @media (min-width: 992px){ .create-event-page .content-wrap { max-width: 800px; margin: 0 auto; } }
-
-  /* optional image preview (edit mode) */
-  .current-image{border-radius:14px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,.1);}
-</style>
-{% endblock %}
-
 {% block body %}
 
 {# ------- tiny helper macros for rendering with errors ------- #}

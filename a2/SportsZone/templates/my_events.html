@@ -1,40 +1,6 @@
 {% extends "base.html" %}
 {% block title %}My Events · SportsZone{% endblock %}
 
-{% block extra_css %}
-<style>
-  .my-events-page { padding-top: .75rem; background:#eaf7f5; }
-  .my-events-page .page-title { font-weight: 800; color: #004a46; margin-bottom: 1rem; }
-
-  .event-card{
-    border:1px solid rgba(0,0,0,.05);
-    border-radius:16px; overflow:hidden; background:#fff;
-    box-shadow:0 6px 16px rgba(0,0,0,.06);
-    transition:transform .18s ease, box-shadow .18s ease; height:100%;
-    display:flex; flex-direction:column;
-  }
-  .event-card:hover{ transform:translateY(-3px); box-shadow:0 12px 28px rgba(0,0,0,.12); }
-
-  .thumb-wrap{ position:relative; min-height:200px; background:#eaf7f5; }
-  .thumb{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-
-  .body{ padding:1rem 1.25rem 0.5rem; }
-  .title{ font-size:1.15rem; font-weight:800; margin:0; color:#0f2f28; }
-  .meta{ margin-top:.35rem; color:#6b7280; font-size:.92rem; }
-  .badge{ font-weight:700; }
-
-  .card-footer{ background:transparent; border-top:0; padding:0 1.25rem 1.1rem; margin-top:auto; }
-  .actions .btn{ border-radius:12px; font-weight:600; }
-  .btn-primary{ background:#00bfa6; border:none; }
-  .btn-primary:hover{ background:#009e8a; }
-
-  @media (max-width:767px){
-    .thumb-wrap{ min-height:160px; }
-    .body{ padding:.9rem 1rem .25rem; }
-    .card-footer{ padding:0 1rem 1rem; }
-  }
-</style>
-{% endblock %}
 
 {% block body %}
 <div class="my-events-page">
