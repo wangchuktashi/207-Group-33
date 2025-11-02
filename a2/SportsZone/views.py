@@ -87,7 +87,7 @@ def view_event(event_id: int):
 
 
 # Create / Edit event (login required)
-@main_bp.route("/create-event", methods=["GET", "POST"])
+@main_bp.route("/create-event/", methods=["GET", "POST"])
 @main_bp.route("/create-event/<int:event_id>", methods=["GET", "POST"])
 @login_required
 def create_event(event_id: int | None = None):
