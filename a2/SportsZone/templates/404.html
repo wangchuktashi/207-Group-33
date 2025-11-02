@@ -2,11 +2,14 @@
 {% block title %}Not Found{% endblock %}
 {% block body %}
 <div class="container py-5">
-  <div class="errorpage">
-    <h1 class="display-5">404 — Page Not Found</h1>
-    <img src="/static/img/error-404.gif" alt="error-404-gif" width="480" height="480" />
-    <p class="lead">Looks like your shot at the page got totally rejected.</p>
-    <p class="lead">Double check the URL or return to the <a href="{{ url_for('main.index') }}">home page</a>.</p>
+  <div class="errorpage" role="main" aria-labelledby="err-title">
+    <h1 id="err-title" class="display-5">404 — Page Not Found</h1>
+    <p class="lead mb-2">Looks like your shot at the page got totally rejected.</p>
+
+    <img src="{{ url_for('static', filename='img/error-404.gif') }}" alt="page not found" />
+
+    <p class="text-muted mb-2">Double check the URL refer to the quick links below or you can <a class="btn-home" href="{{ url_for('main.index') }}" title="Return to home">go to home.</a>
+
   </div>
 </div>
 {% endblock %}
