@@ -7,6 +7,8 @@ from . import db
 from .models import Event, Venue, Comment, Booking
 from .forms import EventForm, CommentForm, BookingForm
 
+from datetime import datetime, timezone
+
 # Blueprint
 main_bp = Blueprint("main", __name__)
 
@@ -19,6 +21,20 @@ def index():
     #category: sports_type (e.g. football, tennis), 'all' to disable
     #status:Open / Sold Out / Cancelled / Inactive, 'all' to disable
     #q:free text search across title, teams, and venue name
+
+    # Auto-mark past events as Inactive
+    now = datetime.now()
+    expired_events = Event.query.filter(
+        Event.end_datetime.isnot(None),      # Ignore NULL endtime
+        Event.end_datetime < now,
+        Event.status.notin_(["Inactive", "Cancelled"])  # Only update Open Events
+    ).all()
+
+    for e in expired_events:
+        e.status = "Inactive"
+
+    if expired_events:
+        db.session.commit()
     
     cat = (request.args.get("category") or "all").lower()
     st  = (request.args.get("status") or "all").lower()
